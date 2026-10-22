@@ -24,8 +24,8 @@ const DONE = {
 };
 
 export function pick({state, step, job, busy, since, flash}) {
-  if (!state) return {who: 'dsf', text: '正在读取设置……'};
   if (flash?.tone === 'error') return {who: 'dsf', expr: 'sad', alert: true, text: flash.text};
+  if (!state) return {who: 'dsf', text: '正在读取设置……'};
   if (job.action === 'bind' && busy && job.code) {
     return {who: 'hachi', expr: 'calm', other: 'surprised', text: `我在听！去群里 @机器人 发送「${job.code}」就好喵。`};
   }

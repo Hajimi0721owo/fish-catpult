@@ -18,6 +18,12 @@ function show(id, visible) { if ($(id)) $(id).hidden = !visible; }
 function notice(message, tone = 'error', action) {
   flash = message ? {text: message, tone, action, at: Date.now()} : null;
   text('notice', message); show('notice', !!message); $('notice').className = tone;
+  if (!state && message && tone === 'error') {
+    const heading = document.createElement('h2'); heading.id = 'page-title'; heading.textContent = '无法读取设置';
+    const help = document.createElement('p');
+    help.textContent = '请确认设置程序仍在运行，并使用启动时提供的完整链接重新打开此页面。';
+    $('content').replaceChildren(heading, help);
+  }
   speak();
 }
 function clock(value) { return new Date(value * 1000).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false}); }
@@ -174,7 +180,7 @@ async function refresh() {
   try {
     state = await api('/api/status');
     const job = state.job || {};
-    if (current < 0) navigate(stepOf[state.next_step], false);
+    if (current < 0) { notice(''); navigate(stepOf[state.next_step], false); }
     if (['done', 'failed'].includes(job.phase) && job.id !== handledJob) {
       handledJob = job.id;
       if (job.phase === 'failed') notice(job.message);

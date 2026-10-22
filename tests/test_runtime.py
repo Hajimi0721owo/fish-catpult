@@ -6,7 +6,7 @@ import time
 import unittest
 from bili_fav_relay.config import Config
 from bili_fav_relay.core.lock import WorkerLock
-from bili_fav_relay.runtime import runtime_status, start_worker, stop_worker
+from bili_fav_relay.runtime import _windows_children, runtime_status, start_worker, stop_worker
 from bili_fav_relay.store import Store
 
 
@@ -17,6 +17,7 @@ class RuntimeTest(unittest.TestCase):
             path = root / "config.json"
             path.write_text(json.dumps({"folder": "1", "data_dir": "data", "sync_mode": "manual", "send_enabled": False}))
             config = Config.load(path)
+            child_count = len(_windows_children)
             started = start_worker(path)
             pid = started["pid"]
             try:
@@ -37,6 +38,9 @@ class RuntimeTest(unittest.TestCase):
                     time.sleep(2.2)
                 if os.name != "nt":
                     os.waitpid(pid, 0)
+                else:
+                    for child in _windows_children[child_count:]:
+                        child.wait(timeout=5)
 
     def test_stale_worker_metadata_cannot_claim_an_unrelated_operation(self):
         with tempfile.TemporaryDirectory() as tmp:

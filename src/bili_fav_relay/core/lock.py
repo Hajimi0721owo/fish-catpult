@@ -18,7 +18,10 @@ def write_owner(path, owner):
 
 def read_owner(path):
     try:
-        return json.loads(path.read_bytes()[1:] or b"{}")
+        # Windows byte-range locks also reject reads that include byte zero.
+        with path.open("rb") as handle:
+            handle.seek(1)
+            return json.loads(handle.read() or b"{}")
     except (FileNotFoundError, ValueError):
         return {}
 
