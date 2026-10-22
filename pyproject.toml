@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bili-fav-relay"
 version = "0.1.0"
-description = "Standalone public Bilibili favorites to official QQ bot relay"
+description = "Fish-CatPult: relay new videos from a public Bilibili favorites folder to a QQ group via your own official QQ bot"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]
@@ -14,6 +14,7 @@ dependencies = ["websockets==16.1.1", "keyring==25.6.0"]
 
 [project.scripts]
 bili-fav-relay = "bili_fav_relay.cli:main"
+fish-catpult = "bili_fav_relay.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

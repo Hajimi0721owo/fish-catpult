@@ -81,6 +81,6 @@ const ready = `<p class="card-head">后台 · 转发中控台<span>设置完成<
   <div class="actions dashboard-actions"><button type="button" data-action="sync" id="sync-button">立即同步</button><button type="button" data-action="start" id="start-button" hidden>启动后台程序</button><button type="button" class="text-button" data-action="cancel" id="cancel-button" hidden>取消本次</button><button type="button" class="text-button quiet" data-action="stop" id="stop-button">停止后台程序</button></div>
   <form id="schedule-form" class="schedule-form"><label for="schedule-mode">修改同步方式</label><div class="inline-fields"><select id="schedule-mode"><option value="manual">手动同步</option><option value="auto">自动同步</option></select><span class="every">每</span>${interval('schedule-interval')}<button type="submit" class="secondary">保存</button></div><p id="schedule-hint" class="hint">${intervalHint}</p></form>
   <div class="tips"><div><strong>验证一下</strong><p>往收藏夹里新收藏一个短视频，再点“立即同步”。两轮读取至少隔 10 秒，遇到访问限制时会暂停。</p></div>
-    <div><strong>也可以直接对 agent 说</strong><p>“现在同步新收藏”<br>“改成每 10 分钟同步”<br>“电脑重启了，启动收藏转发”</p></div></div></div>`;
+    <div><strong>也可以直接对 agent 说</strong><p>“现在同步新收藏”<br>“改成每 10 分钟同步”<br>“电脑重启了，启动投石机”</p></div></div></div>`;
 
 export const views = [folder, bot, group, activate, ready];
