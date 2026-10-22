@@ -70,7 +70,7 @@
 <p align="center"><img src="docs/assets/screens/05-mobile.png" width="320" alt="手机宽度：角色在上，清单横排，设置卡片在下"></p>
 </details>
 
-> 截图来自离线演示：平台接口全部换成了虚构数据，没有访问 B 站或 QQ。
+> 截图来自离线演示：平台接口全部换成了虚构数据，没有访问 B 站或 QQ。当前手动模式下的“转发中”表示后台已启动；没有同步任务时仍在待命，需点击“立即同步”或切换自动模式。
 
 **当前为 0.1 开发版**：匿名收藏夹读取、视频下载和新增收藏到 QQ 群的链路已有实测。现提供本地网页部署向导、系统凭据库保存、独立后台启动和 agent 控制。新用户从零申请机器人并完成真实绑定、Windows/Linux 实机安装及长期无人值守仍待验证。尚未公开发行，未安装开机自启。
 
@@ -256,7 +256,7 @@ bili-fav-relay backup --output /安全位置/relay-state.sqlite3
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-来源与验证见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)。公开发布前需完成长期运行验收、干净机器安装和许可证确认，详见验证文档。本目录可以独立打包；不要把 `.local/`、`data/`、`.env` 或 `config.json` 上传 GitHub。
+来源与验证见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)。本项目按 [MIT 许可证](LICENSE) 开放，包含代码、文档和仓库内图片，来源声明见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。当前适合作为开发版分享；长期运行、干净机器与跨平台安装验收仍待完成，详见验证文档。本目录可以独立打包；不要把 `.local/`、`data/`、`.env` 或 `config.json` 上传 GitHub。
 
 ## 制作
 
@@ -264,4 +264,4 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 
 收藏转发是「哈基米 × 大肥鱼」系列的番外：设置页沿用了系列直播间的粉墙、彩旗、LIVE 角标和名字签对话框，台词都在 [`setup/ui/lines.js`](src/bili_fav_relay/setup/ui/lines.js)。
 
-页面和 README 里的像素角色是系列的角色形象，要和代码分开看待：公开发行前会单独说明它们的使用范围。横幅与截图可用 `python3 docs/assets/src/render.py` 重新生成。
+页面和 README 里的像素角色随项目按 MIT 许可证分发，使用和再分发时保留版权与许可声明。横幅与放大角色图可用 `python3 docs/assets/src/render.py` 重新生成；界面截图需要另行启动离线演示并截取。
