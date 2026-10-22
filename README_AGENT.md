@@ -63,7 +63,7 @@ queued ──▶ preparing（下载、完整解码、上传）──▶ sent（Q
 
 **极速部署**：在你的 agent 里发送：
 
-> 帮我部署 https://github.com/bigapple233/bili-fav-relay ，按仓库里的 README_AGENT.md 完成安装，并引导我打开本地设置向导。
+> 帮我部署 https://github.com/bigapple233/fish-catpult ，按仓库里的 README_AGENT.md 完成安装，并引导我打开本地设置向导。
 
 当前仓库为私密仓库，agent 使用的 GitHub 账号需要有访问权限。机器人密钥在本地设置页填写，不用发到聊天里。
 
