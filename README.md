@@ -8,6 +8,14 @@
 
 ## 安装
 
+**极速部署**：在你的 agent 里发送：
+
+> 帮我部署 https://github.com/bigapple233/bili-fav-relay ，按仓库里的部署指南完成安装，并引导我打开本地设置向导。
+
+当前仓库为私密仓库，agent 使用的 GitHub 账号需要有访问权限。机器人密钥在本地设置页填写，不用发到聊天里。
+
+也可以手动安装：
+
 需要 Python 3.11+ 和可执行的 `ffmpeg`、`ffprobe`（较新 FFmpeg，需支持 `-enc_time_base:v demux`）。macOS 可用 `brew install ffmpeg`，其他系统从 FFmpeg 官方发行渠道安装并加入 PATH。
 
 下载仓库后，在项目目录执行：
