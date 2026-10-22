@@ -1,0 +1,55 @@
+<!doctype html>
+<!-- README 横幅：沿用设置页的直播间（room.css）和角色像素图。用 render.py 截成 PNG。 -->
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../../src/bili_fav_relay/setup/ui/room.css">
+<style>
+  html, body { width: 1280px; height: 420px; overflow: hidden; }
+  body { position: relative; min-height: 0; }
+  .hud { position: absolute; left: 0; right: 0; top: 0; }
+  .bunting, .floor { position: absolute; }
+  .floor { height: 128px; }
+  .title { position: absolute; left: 64px; top: 92px; width: 600px; background: var(--cream); border: 4px solid var(--navy); box-shadow: 0 6px 0 rgb(44 42 76 / .25); z-index: 2; }
+  .title .head { margin: 0; padding: 7px 22px; background: var(--pink); color: #fff; font-weight: 800; font-size: 15px; letter-spacing: .1em; }
+  .title .body { padding: 18px 26px 22px; }
+  .title h1 { margin: 0; font-size: 58px; line-height: 1.1; font-weight: 900; letter-spacing: .04em; color: var(--navy); }
+  .title h1 small { font-size: 22px; letter-spacing: .02em; color: var(--pink); margin-left: 14px; font-weight: 900; }
+  .title p { margin: 12px 0 0; font-size: 19px; font-weight: 800; color: var(--muted); }
+  .flow { display: flex; gap: 8px; margin-top: 16px; }
+  .flow span { padding: 3px 12px; font-size: 14px; font-weight: 800; border: 3px solid var(--navy); background: #fff; }
+  .flow b { align-self: center; color: var(--pink); font-weight: 900; }
+  .cast { left: 880px; bottom: 34px; --px: 2; z-index: 2; }
+  #actor-dsf { margin-left: -20px; }
+  .bubble { position: absolute; z-index: 3; padding: 8px 14px; background: var(--cream); border: 3px solid var(--navy); font-weight: 900; font-size: 17px; color: var(--navy); white-space: nowrap; }
+  .bubble i { position: absolute; bottom: -12px; width: 14px; height: 12px; background: var(--navy); clip-path: polygon(0 0, 100% 0, 30% 100%); }
+  .bubble .who { display: block; font-size: 12px; color: #fff; background: var(--lilac); margin: -8px -14px 6px; padding: 1px 14px; letter-spacing: .06em; }
+  .bubble.dsf .who { background: #4a63c9; }
+  .b1 { left: 820px; top: 84px; } .b1 i { left: 110px; }
+  .b2 { left: 1060px; top: 62px; } .b2 i { left: 60px; }
+</style>
+</head>
+<body>
+  <header class="hud">
+    <span class="chip live"><i></i>LIVE · 转发中</span>
+    <span class="chip dark">哈基米在运营</span>
+    <span class="chip gold">进度 4/4</span>
+  </header>
+  <div class="bunting"></div>
+  <div class="title">
+    <p class="head">哈基米 × 大肥鱼 · 番外</p>
+    <div class="body">
+      <h1>收藏转发<small>Bili Fav Relay</small></h1>
+      <p>B 站收藏夹里的新视频，自动送进你的 QQ 群</p>
+      <div class="flow"><span>点个收藏</span><b>▶</b><span>大肥鱼记下</span><b>▶</b><span>哈基米送进群</span></div>
+    </div>
+  </div>
+  <div class="bubble b1"><span class="who">哈基米</span>送进群里喵～<i></i></div>
+  <div class="bubble dsf b2"><span class="who">大肥鱼</span>新收藏我来盯！<i></i></div>
+  <div class="cast">
+    <img class="actor" src="../../../src/bili_fav_relay/setup/ui/art/hachi-happy.png" width="95" height="128" alt="">
+    <img class="actor" id="actor-dsf" src="../../../src/bili_fav_relay/setup/ui/art/dsf-happy.png" width="90" height="128" alt="">
+  </div>
+  <div class="floor"></div>
+</body>
+</html>

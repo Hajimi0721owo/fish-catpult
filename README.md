@@ -1,8 +1,76 @@
-# Bili Fav Relay · 收藏转发
+<p align="center">
+  <img src="docs/assets/banner.png" alt="收藏转发：哈基米和大肥鱼在直播间里值班，LIVE 转发中" width="100%">
+</p>
 
-将公开 B 站收藏夹中的新增普通视频，以 360P 下载成 MP4，通过自己的 QQ 官方机器人发送到绑定群。
+<h1 align="center">收藏转发 · Bili Fav Relay</h1>
+
+<p align="center">
+  <b>B 站收藏夹里的新视频，自动送进你的 QQ 群。</b><br>
+  哈基米 × 大肥鱼系列番外：她们俩在你电脑的后台值班，你只管点收藏。
+</p>
+
+<p align="center">
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-ef6b9a?style=flat-square&labelColor=2c2a4c">
+  <img alt="QQ 官方机器人" src="https://img.shields.io/badge/QQ-%E5%AE%98%E6%96%B9%E6%9C%BA%E5%99%A8%E4%BA%BA-8b8fe0?style=flat-square&labelColor=2c2a4c">
+  <img alt="B站 不用 Cookie" src="https://img.shields.io/badge/B%E7%AB%99-%E4%B8%8D%E7%94%A8%20Cookie-3fae7f?style=flat-square&labelColor=2c2a4c">
+  <img alt="运行 只在本机" src="https://img.shields.io/badge/%E8%BF%90%E8%A1%8C-%E5%8F%AA%E5%9C%A8%E6%9C%AC%E6%9C%BA-f6c94e?style=flat-square&labelColor=2c2a4c">
+  <img alt="版本 0.1 开发版" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1%20%E5%BC%80%E5%8F%91%E7%89%88-e2434f?style=flat-square&labelColor=2c2a4c">
+</p>
+
+<p align="center">
+  <a href="#安装">安装</a> ·
+  <a href="#推荐跟随本地向导">本地向导</a> ·
+  <a href="#与-agent-对话控制">让 agent 帮你管</a> ·
+  <a href="#失败与恢复">出了问题</a> ·
+  <a href="docs/deployment.md">部署指南</a>
+</p>
+
+## 今天值班的是
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/assets/hachi.png" width="190" height="256" alt="哈基米，紫色猫耳的像素女孩"></td>
+    <td align="center" width="50%"><img src="docs/assets/dsf.png" width="180" height="256" alt="大肥鱼，深蓝长发的像素鲸鱼女仆"></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>哈基米</b> · 运营，管 QQ 那头<br>帮你连上自己的 QQ 机器人，和群里对上暗号，再把视频送进群。说话会带“喵”。</td>
+    <td valign="top"><b>大肥鱼</b> · 看着收藏夹<br>认出你要分享的收藏夹，把已有的收藏记在小本本上，一个都不补发；想事情的时候会“深度思考”。</td>
+  </tr>
+</table>
+
+**她们怎么接力**：你在 B 站点个收藏 → 大肥鱼发现新增 → 下载成 360P 的 MP4 → 哈基米用你自己的 QQ 官方机器人发进绑定的群。
 
 这是独立运行的 Python 工具。安装后不需要 agent、模型 API 或 token 消耗；也不需要 B 站 Cookie。你可以让 agent 按本文件帮助安装、配置和日常控制，控制说明见 [docs/agent-usage.md](docs/agent-usage.md)。
+
+## 后台长这样
+
+装好后运行 `bili-fav-relay setup`，浏览器里会打开她们的直播间。四步清单走完就开始转发，每一步都有人告诉你在做什么、出错了该怎么办。
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/assets/screens/01-folder.png" alt="第 1 步：大肥鱼请你粘贴收藏夹链接"></td>
+    <td width="50%"><img src="docs/assets/screens/02-bind.png" alt="第 3 步：哈基米竖着耳朵等群里的绑定口令"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>① 大肥鱼：先告诉我要分享哪个收藏夹</sub></td>
+    <td align="center"><sub>③ 哈基米：去群里 @机器人 发口令，我在听喵</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/assets/screens/03-ready.png" alt="设置完成：转发中控台，后台运行中"></td>
+    <td><img src="docs/assets/screens/04-ready-night.png" alt="夜间模式：直播间关了大灯，挂起小灯串"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>开工啦：转发中控台，随时同步、改节奏、启停</sub></td>
+    <td align="center"><sub>系统切到深色时，直播间会换成夜里的房间</sub></td>
+  </tr>
+</table>
+
+<details>
+<summary>手机宽度下的样子</summary>
+<p align="center"><img src="docs/assets/screens/05-mobile.png" width="320" alt="手机宽度：角色在上，清单横排，设置卡片在下"></p>
+</details>
+
+> 截图来自离线演示：平台接口全部换成了虚构数据，没有访问 B 站或 QQ。
 
 **当前为 0.1 开发版**：匿名收藏夹读取、视频下载和新增收藏到 QQ 群的链路已有实测。现提供本地网页部署向导、系统凭据库保存、独立后台启动和 agent 控制。新用户从零申请机器人并完成真实绑定、Windows/Linux 实机安装及长期无人值守仍待验证。尚未公开发行，未安装开机自启。
 
@@ -189,3 +257,11 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
 来源与验证见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)。公开发布前需完成长期运行验收、干净机器安装和许可证确认，详见验证文档。本目录可以独立打包；不要把 `.local/`、`data/`、`.env` 或 `config.json` 上传 GitHub。
+
+## 制作
+
+<img src="docs/assets/hachi.png" width="48" height="64" alt=""> <img src="docs/assets/dsf.png" width="45" height="64" alt="">
+
+收藏转发是「哈基米 × 大肥鱼」系列的番外：设置页沿用了系列直播间的粉墙、彩旗、LIVE 角标和名字签对话框，台词都在 [`setup/ui/lines.js`](src/bili_fav_relay/setup/ui/lines.js)。
+
+页面和 README 里的像素角色是系列的角色形象，要和代码分开看待：公开发行前会单独说明它们的使用范围。横幅与截图可用 `python3 docs/assets/src/render.py` 重新生成。
