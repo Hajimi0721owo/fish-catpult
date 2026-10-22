@@ -1,0 +1,18 @@
+{
+  "data_dir": "data",
+  "folder": "填写公开收藏夹ID",
+  "poll_seconds": 900,
+  "sync_mode": "auto",
+  "delivery_gap_seconds": 10,
+  "page_gap_seconds": 3,
+  "max_pages": 5,
+  "quality": 16,
+  "max_video_bytes": 30000000,
+  "max_duration_seconds": 1800,
+  "multipart_policy": "reject",
+  "send_enabled": false,
+  "max_sends_per_cycle": 1,
+  "qq_app_id_env": "BILI_RELAY_QQ_APP_ID",
+  "qq_secret_env": "BILI_RELAY_QQ_APP_SECRET",
+  "max_cache_bytes": 1000000000
+}

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bili-fav-relay"
+version = "0.1.0"
+description = "Standalone public Bilibili favorites to official QQ bot relay"
+readme = "README.md"
+license-files = ["THIRD_PARTY_LICENSES.md"]
+requires-python = ">=3.11"
+dependencies = ["websockets==16.1.1", "keyring==25.6.0"]
+
+[project.scripts]
+bili-fav-relay = "bili_fav_relay.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+bili_fav_relay = ["setup/ui/*.html", "setup/ui/*.css", "setup/ui/*.js", "setup/ui/art/*.png"]

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>收藏转发 · 后台</title>
+  <link rel="icon" href="/art/hachi-happy.png">
+  <link rel="stylesheet" href="/room.css">
+  <link rel="stylesheet" href="/panel.css">
+</head>
+<body>
+  <header class="hud">
+    <span class="chip live"><i></i><span id="hud-live">设置中</span></span>
+    <span class="chip dark">哈基米在运营</span>
+    <span class="chip gold" id="hud-progress">进度 0/4</span>
+    <span class="hud-title">收藏转发 · 后台</span>
+    <span class="chip local" title="设置页只在这台电脑上打开">仅本机可见</span>
+  </header>
+  <div class="room">
+    <div class="bunting" aria-hidden="true"></div>
+    <div class="stage">
+      <section class="scene" aria-label="向导">
+        <div class="poster" aria-label="设置清单">
+          <p class="poster-title">设置清单</p>
+          <nav id="steps" aria-label="设置步骤"></nav>
+        </div>
+        <div class="cast" aria-hidden="true">
+          <img class="actor" id="actor-hachi" src="/art/hachi-calm.png" alt="" width="95" height="128">
+          <img class="actor" id="actor-dsf" src="/art/dsf-calm.png" alt="" width="90" height="128">
+        </div>
+        <div class="dialog" id="dialog">
+          <span class="name-tab" id="dialog-name">大肥鱼</span>
+          <p id="dialog-text" aria-hidden="true">正在读取设置…</p>
+          <span id="dialog-live" class="sr-only" role="status" aria-live="polite"></span>
+          <span class="dialog-next" aria-hidden="true">▼</span>
+        </div>
+      </section>
+      <main class="card" id="main">
+        <section id="content" aria-labelledby="page-title"><div class="loading">正在读取设置…</div></section>
+        <div id="notice" role="alert" hidden></div>
+      </main>
+    </div>
+    <div class="floor" aria-hidden="true"></div>
+  </div>
+  <footer class="page-footer"><span>设置链接只在这台电脑上有效，不要分享给别人</span><span>关闭这个页面不影响已启动的后台程序</span></footer>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

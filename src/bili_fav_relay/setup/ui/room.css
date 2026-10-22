@@ -1,0 +1,130 @@
+/* 房间与角色：沿用大肥鱼系列的直播间（粉墙、木地板、彩旗、LIVE 角标、名字签对话框）。 */
+:root {
+  color-scheme: light dark;
+  --wall: #f3c9cf; --wall-dot: #f9dfe3; --wall-low: #e9b4be; --rail: #fbe8ea;
+  --wood: #c98c5b; --wood-dark: #b07548; --wood-line: #9a6239;
+  --navy: #2c2a4c; --ink: #2c2a4c; --muted: #6d6585; --cream: #fffaf3; --cream-2: #f7efe6;
+  --pink: #ef6b9a; --pink-soft: #ffe3ec; --red: #e2434f; --gold: #f6c94e; --gold-ink: #6b4a12;
+  --lilac: #8b8fe0; --mint: #3fae7f; --flag-1: #f39bb6; --flag-2: #f6d36b; --flag-3: #9bc8f2; --flag-4: #b8a3ee;
+  --hud-h: 60px; --px: 3; --bulbs: linear-gradient(transparent, transparent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #2f2742; --wall-dot: #3a3052; --wall-low: #272036; --rail: #43395c;
+    --wood: #5c3f2e; --wood-dark: #4d3426; --wood-line: #3c281d;
+    --flag-1: #8c5a70; --flag-2: #8f7a45; --flag-3: #4f6a86; --flag-4: #67588c;
+    --bulbs: radial-gradient(circle at 50% 50%, #fff3c4 0 3px, rgb(255 214 120 / .45) 4px 6px, transparent 9px) 10px 0 / 56px 18px repeat-x;
+  }
+}
+:root[data-theme="dark"] {
+  --wall: #2f2742; --wall-dot: #3a3052; --wall-low: #272036; --rail: #43395c;
+  --wood: #5c3f2e; --wood-dark: #4d3426; --wood-line: #3c281d;
+  --flag-1: #8c5a70; --flag-2: #8f7a45; --flag-3: #4f6a86; --flag-4: #67588c;
+    --bulbs: radial-gradient(circle at 50% 50%, #fff3c4 0 3px, rgb(255 214 120 / .45) 4px 6px, transparent 9px) 10px 0 / 56px 18px repeat-x;
+}
+* { box-sizing: border-box; }
+html { background: var(--wall); }
+body {
+  margin: 0; min-height: 100vh; color: var(--ink);
+  font: 500 15px/1.7 -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  background: radial-gradient(var(--wall-dot) 2px, transparent 2.6px) 0 0 / 44px 44px,
+              radial-gradient(var(--wall-dot) 1.5px, transparent 2px) 22px 22px / 44px 44px, var(--wall);
+}
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.notch { clip-path: polygon(0 6px, 6px 6px, 6px 0, calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)); }
+
+/* 顶部角标：LIVE / 谁在运营 / 进度，和片子左上角一样 */
+.hud { position: sticky; top: 0; z-index: 20; height: var(--hud-h); display: flex; align-items: center; gap: 8px; padding: 0 20px; }
+.chip { display: inline-flex; align-items: center; gap: 7px; height: 32px; padding: 0 12px; font-weight: 800; font-size: 14px; white-space: nowrap;
+  border: 3px solid var(--navy); background: var(--cream); color: var(--navy);
+  clip-path: polygon(0 3px, 3px 3px, 3px 0, calc(100% - 3px) 0, calc(100% - 3px) 3px, 100% 3px, 100% calc(100% - 3px), calc(100% - 3px) calc(100% - 3px), calc(100% - 3px) 100%, 3px 100%, 3px calc(100% - 3px), 0 calc(100% - 3px)); }
+.chip.live { background: var(--red); color: #fff; }
+.chip.live.off { background: #8d86a3; }
+.chip.live.off i { animation: none; }
+.chip.live i { width: 9px; height: 9px; background: #fff; animation: blink-dot 1.6s steps(1) infinite; }
+.chip.dark { background: #3d3552; color: #fff; }
+.chip.gold { background: var(--gold); color: var(--gold-ink); font-variant-numeric: tabular-nums; }
+.chip.local { margin-left: auto; font-size: 12.5px; height: 28px; background: rgb(255 250 243 / .8); }
+.hud-title { margin-left: 8px; font-weight: 800; color: var(--navy); opacity: .55; font-size: 13px; }
+@keyframes blink-dot { 50% { opacity: .2; } }
+
+/* 房间：彩旗、地板。地板固定在视口底部，角色站在上面 */
+.room { position: relative; }
+.bunting { position: fixed; top: calc(var(--hud-h) - 4px); left: 0; right: 0; height: 30px; z-index: 0; pointer-events: none;
+  background: var(--bulbs),
+    conic-gradient(from 150deg at 50% 0, var(--flag-1) 0 60deg, transparent 0) 0 6px / 168px 24px repeat-x,
+    conic-gradient(from 150deg at 50% 0, var(--flag-2) 0 60deg, transparent 0) 42px 6px / 168px 24px repeat-x,
+    conic-gradient(from 150deg at 50% 0, var(--flag-3) 0 60deg, transparent 0) 84px 6px / 168px 24px repeat-x,
+    conic-gradient(from 150deg at 50% 0, var(--flag-4) 0 60deg, transparent 0) 126px 6px / 168px 24px repeat-x,
+    linear-gradient(var(--navy), var(--navy)) 0 4px / 100% 2px no-repeat;
+  opacity: .9; }
+.floor { position: fixed; left: 0; right: 0; bottom: 0; height: 170px; z-index: 0; pointer-events: none;
+  background:
+    linear-gradient(var(--rail), var(--rail)) 0 0 / 100% 10px no-repeat,
+    linear-gradient(var(--wall-low), var(--wall-low)) 0 10px / 100% 58px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 158px, var(--wood-line) 158px 161px) 0 68px / 100% 34px no-repeat,
+    repeating-linear-gradient(90deg, transparent 0 80px, var(--wood-line) 80px 83px, transparent 83px 158px) 0 102px / 100% 34px no-repeat,
+    repeating-linear-gradient(180deg, var(--wood) 0 31px, var(--wood-dark) 31px 34px) 0 68px / 100% 102px no-repeat; }
+
+.stage { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 18px 28px 200px;
+  display: grid; grid-template-columns: minmax(400px, 1fr) minmax(0, 620px); gap: 28px; align-items: start; }
+.scene { position: sticky; top: calc(var(--hud-h) + 14px); height: calc(100vh - var(--hud-h) - 14px); min-height: 560px; }
+
+/* 设置清单：片子里"筹备清单"的样子，粉色表头 + 勾选框 */
+.poster { width: 268px; background: var(--cream); border: 4px solid var(--navy); }
+.poster-title { margin: 0; padding: 6px 14px; background: var(--pink); color: #fff; font-weight: 800; font-size: 14px; letter-spacing: .08em; }
+nav { display: grid; padding: 6px 8px 8px; }
+nav button { all: unset; box-sizing: border-box; display: grid; grid-template-columns: 26px 1fr; column-gap: 10px; align-items: center; padding: 7px 8px; cursor: pointer; border-bottom: 2px dashed #e8dccf; }
+nav button:last-child { border-bottom: 0; }
+nav button:focus-visible { outline: 3px solid var(--lilac); }
+nav button:disabled { cursor: default; opacity: .55; }
+nav button.selected { background: var(--pink-soft); }
+nav .box { position: relative; width: 22px; height: 22px; border: 3px solid var(--navy); background: #fff; grid-row: span 2; }
+nav button.done .box::after { content: ''; position: absolute; left: 3px; top: -9px; width: 8px; height: 18px; border: solid var(--red); border-width: 0 5px 5px 0; transform: rotate(40deg); }
+nav b { font-size: 15px; font-weight: 800; }
+nav small { grid-column: 2; font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 角色：整数倍放大的像素图，脚踩地板 */
+.cast { position: absolute; left: 0; bottom: 66px; display: flex; align-items: flex-end; }
+.actor { width: calc(var(--w, 95px) * var(--px)); height: calc(128px * var(--px)); image-rendering: pixelated; transform-origin: 50% 100%; transition: filter .2s; }
+#actor-hachi { --w: 95px; }
+#actor-dsf { --w: 90px; margin-left: -38px; }
+.actor.talking { animation: hop .5s steps(2) infinite; }
+.actor.quiet { filter: saturate(.85) brightness(.97); }
+@keyframes hop { 50% { transform: translateY(calc(var(--px) * -2px)); } }
+.cast::after { content: ''; position: absolute; left: 30px; right: 30px; bottom: -8px; height: 16px; background: rgb(60 30 40 / .18); border-radius: 50%; z-index: -1; }
+
+/* 对话框：深蓝边、奶油底、名字签，和片子一样 */
+.dialog { position: absolute; left: 0; right: 0; bottom: 22px; min-height: 120px; padding: 22px 26px 18px; background: var(--cream); border: 4px solid var(--navy); box-shadow: inset 0 0 0 3px #e4ddf5; z-index: 2; }
+.dialog p { margin: 0; font-size: 19px; font-weight: 800; line-height: 1.6; color: var(--navy); overflow-wrap: anywhere; }
+.name-tab { position: absolute; top: -20px; left: 18px; padding: 2px 14px; background: var(--lilac); color: #fff; font-weight: 800; font-size: 15px; border: 3px solid var(--navy); }
+.dialog.dsf .name-tab { background: #4a63c9; }
+.dialog.alert { box-shadow: inset 0 0 0 3px #f6c3c7; }
+.dialog-next { position: absolute; right: 16px; bottom: 8px; color: var(--pink); font-size: 12px; animation: blink-dot 1s steps(1) infinite; }
+.dialog.typing .dialog-next { visibility: hidden; }
+
+.page-footer { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 16px; max-width: 1240px; margin: -170px auto 0; padding: 0 28px 24px; font-size: 12px; color: #fbe8ea; text-shadow: 0 1px 0 var(--wood-line); }
+
+@media (max-height: 860px) { :root { --px: 2; } }
+@media (max-width: 980px) {
+  :root { --px: 2; }
+  .stage { grid-template-columns: 1fr; padding: 10px 16px 190px; gap: 18px; }
+  .scene { position: relative; top: 0; height: auto; min-height: 0; display: grid; gap: 16px; }
+  .cast { position: relative; bottom: auto; height: 150px; overflow: hidden; justify-content: center; align-items: flex-start; order: 1; margin-bottom: -10px; }
+  .cast::after { display: none; }
+  .dialog { position: relative; bottom: auto; min-height: 0; order: 2; padding: 20px 18px 16px; }
+  .dialog p { font-size: 16px; }
+  .poster { width: auto; order: 3; }
+  nav { grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 6px; }
+  nav button { grid-template-columns: 1fr; justify-items: center; text-align: center; border: 0; padding: 6px 2px; row-gap: 4px; }
+  nav .box { grid-row: auto; }
+  nav b { font-size: 12.5px; }
+  nav small { display: none; }
+  .hud { padding: 0 12px; gap: 6px; }
+  .hud-title, .chip.dark { display: none; }
+  .page-footer { display: block; padding-inline: 16px; }
+  .page-footer span { display: block; }
+}
+@media (max-width: 380px) { .chip.local { display: none; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
