@@ -2,7 +2,7 @@
 from dataclasses import replace
 import time
 import uuid
-from ..config import MIN_POLL_SECONDS
+from ..config import MIN_POLL_SECONDS, poll_interval
 
 ACTIVE = {"pending", "waiting", "running"}
 
@@ -16,18 +16,17 @@ class Control:
         return replace(self.config, sync_mode=saved.get("mode", self.config.sync_mode),
                        poll_seconds=saved.get("poll_seconds", self.config.poll_seconds))
 
-    def schedule(self, mode=None, minutes=None):
+    def schedule(self, mode=None, minutes=None, seconds=None):
         if mode is not None and mode not in {"auto", "manual"}:
             raise ValueError("同步模式只能是 auto 或 manual")
-        if minutes is not None and (type(minutes) is not int or not 5 <= minutes <= 1440):
-            raise ValueError("同步间隔须为 5–1440 分钟；不会突破最低 5 分钟请求间隔")
-        if mode is not None or minutes is not None:
+        interval = poll_interval(minutes=minutes, seconds=seconds)
+        if mode is not None or interval is not None:
             def update(saved):
                 result = dict(saved or {})
                 if mode is not None:
                     result["mode"] = mode
-                if minutes is not None:
-                    result["poll_seconds"] = minutes * 60
+                if interval is not None:
+                    result["poll_seconds"] = interval
                 return result
             self.store.mutate_meta("controls", update, {})
         return self.summary()
@@ -43,8 +42,10 @@ class Control:
         if request:
             public_request = {key: value for key, value in request.items() if key != "ids"}
             public_request["counts"] = self.store.job_counts(request.get("ids", []))
-        return {"mode": config.sync_mode, "interval_minutes": config.poll_seconds // 60,
-                "send_enabled": config.send_enabled, "minimum_interval_minutes": MIN_POLL_SECONDS // 60,
+        return {"mode": config.sync_mode, "interval_seconds": config.poll_seconds,
+                "interval_minutes": config.poll_seconds / 60,
+                "send_enabled": config.send_enabled, "minimum_interval_seconds": MIN_POLL_SECONDS,
+                "minimum_interval_minutes": MIN_POLL_SECONDS / 60,
                 "next_auto_scan_at": due if config.sync_mode == "auto" else None,
                 "source_paused": self.store.get("source_paused", False),
                 "delivery_paused": self.store.get("delivery_paused", False),

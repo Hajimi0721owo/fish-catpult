@@ -1,6 +1,6 @@
 """同一订阅的源请求预算；预检和正式扫描共用持久冷却与风控暂停。"""
 import time
-from ..config import MIN_POLL_SECONDS
+from ..config import MIN_POLL_SECONDS, MIN_BACKOFF_SECONDS
 
 
 class SourceAccess:
@@ -31,7 +31,7 @@ class SourceAccess:
         failures = self.store.get("poll_failures", 0) + 1
         self.store.set("poll_failures", failures)
         self.store.set("poll_error", kind)
-        self.store.set("next_poll_at", self.clock() + min(86400, self.config.poll_seconds * 2 ** min(failures, 6)))
+        self.store.set("next_poll_at", self.clock() + min(86400, max(MIN_BACKOFF_SECONDS, self.config.poll_seconds) * 2 ** min(failures, 6)))
         if kind in {"rate_or_risk_control", "api_error", "page_budget"}:
             self.store.set("source_paused", True)
         return {"status": "failed", "error": kind, "source_paused": self.store.get("source_paused", False)}

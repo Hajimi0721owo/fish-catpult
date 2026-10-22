@@ -20,7 +20,7 @@ def setup_status(path, clock=time.time):
     path = Path(path).resolve()
     tools = {name: shutil.which(name) is not None for name in ("ffmpeg", "ffprobe")}
     result = {"config_path": str(path), "tools": tools, "folder": None, "bot": None, "binding": None,
-              "baseline": False, "seen": 0, "send_enabled": False, "mode": "manual", "interval_minutes": 15,
+              "baseline": False, "seen": 0, "send_enabled": False, "mode": "manual", "interval_minutes": 15, "interval_seconds": 900,
               "runtime": {"active": False, "status": "stopped"}, "next_step": "folder",
               "job": read_json(progress_path(path), {}), "network_requests": 0}
     try:
@@ -42,7 +42,7 @@ def setup_status(path, clock=time.time):
         result["configuration_incomplete"] = True
         return result
     result.update(folder=config.folder, send_enabled=config.send_enabled, mode=config.sync_mode,
-                  interval_minutes=config.poll_seconds // 60, next_step="credentials")
+                  interval_minutes=config.poll_seconds / 60, interval_seconds=config.poll_seconds, next_step="credentials")
     info = read_json(config.data_dir / "setup-info.json", {})
     result.update(folder_title=info.get("folder_title", ""), folder_count=info.get("folder_count"))
     present = bool(config.credential_id) or all(os.getenv(k, "").strip() for k in (config.qq_app_id_env, config.qq_secret_env))
@@ -61,7 +61,7 @@ def setup_status(path, clock=time.time):
         try:
             status, control = store.status(), Control(config, store).summary()
             result.update(baseline=status["initialized"], seen=status["seen"], counts=status["counts"], control=control,
-                          mode=control["mode"], interval_minutes=control["interval_minutes"],
+                          mode=control["mode"], interval_minutes=control["interval_minutes"], interval_seconds=control["interval_seconds"],
                           folder_title=store.get("folder_title", "") or result["folder_title"])
         finally:
             store.close()

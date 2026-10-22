@@ -6,8 +6,25 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlsplit, parse_qs
 
-MIN_POLL_SECONDS = 300
+MIN_POLL_SECONDS = 10
+MAX_POLL_SECONDS = 86400
+MIN_BACKOFF_SECONDS = 300
 WORKER_TICK_SECONDS = 2
+
+
+def poll_interval(*, minutes=None, seconds=None):
+    """入口单位统一为整数秒；拒绝冲突、布尔值和小数，避免静默截断。"""
+    if minutes is not None and seconds is not None:
+        raise ValueError("同步间隔请选择秒或分钟，不要同时填写")
+    value = seconds if seconds is not None else minutes
+    if value is None:
+        return None
+    if type(value) is not int:
+        raise ValueError("同步间隔须为整数")
+    value = value if seconds is not None else value * 60
+    if not MIN_POLL_SECONDS <= value <= MAX_POLL_SECONDS:
+        raise ValueError("同步间隔须为 10–86400 秒（最多 24 小时）")
+    return value
 
 
 def folder_id(value):
@@ -63,7 +80,7 @@ class Config:
         raw["folder"] = folder_id(raw["folder"])
         raw["data_dir"] = (path.parent / raw.get("data_dir", "data")).resolve()
         config = cls(**raw)
-        for key, low, high in [("poll_seconds", MIN_POLL_SECONDS, 86400), ("max_pages", 1, 50),
+        for key, low, high in [("poll_seconds", MIN_POLL_SECONDS, MAX_POLL_SECONDS), ("max_pages", 1, 50),
                                ("delivery_gap_seconds", 10, 86400),
                                ("max_video_bytes", 1024, 30_000_000),
                                ("max_duration_seconds", 1, 7200),

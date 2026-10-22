@@ -117,3 +117,15 @@ input[type=radio] { flex: none; width: 18px; height: 18px; margin: 3px 0 0; acce
   .baseline-row { flex-wrap: wrap; }
 }
 @media (min-width: 981px) { #notice { display: none; } }  /* 宽屏时角色在对话框里说，不重复 */
+
+/* 同步节奏：数值与单位放一起，窄屏也不拆散。 */
+.interval-input { display: flex; gap: 8px; min-width: 0; }
+.interval-input input { width: 112px; }
+.interval-input select { width: 90px; flex: none; }
+.inline-fields > select { min-width: 120px; }
+@media (max-width: 980px) {
+  .inline-fields > select { min-width: 100%; }
+  .inline-fields .interval-input input { width: 96px; }
+  .inline-fields .interval-input select { min-width: 0; width: 78px; }
+  .inline-fields > button { padding-inline: 12px; }
+}

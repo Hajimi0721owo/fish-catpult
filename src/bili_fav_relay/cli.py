@@ -105,7 +105,7 @@ def control_command(args, config):
         store.assert_folder(config.folder)
         control = Control(config, store)
         if args.command == "schedule":
-            emit(control.schedule(args.mode, args.minutes))
+            emit(control.schedule(args.mode, args.minutes, args.seconds))
             return 0
         if args.cancel:
             emit(control.cancel_sync())
@@ -146,7 +146,9 @@ def main():
     sub.add_parser("resume")
     schedule = sub.add_parser("schedule", help="查看或修改同步模式与间隔；不发网络请求")
     schedule.add_argument("--mode", choices=["auto", "manual"])
-    schedule.add_argument("--minutes", type=int)
+    interval = schedule.add_mutually_exclusive_group()
+    interval.add_argument("--minutes", type=int, help="整数分钟，1–1440")
+    interval.add_argument("--seconds", type=int, help="整数秒，10–86400")
     sub.add_parser("sync", help="本次扫描并转发待发视频，保留原模式与冷却").add_argument("--cancel", action="store_true")
     sub.add_parser("bind").add_argument("--alias", default="我的 QQ 群")
     sub.add_parser("run").add_argument("--once", action="store_true")

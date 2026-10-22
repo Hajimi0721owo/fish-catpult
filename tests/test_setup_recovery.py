@@ -107,7 +107,10 @@ class RecoveryTest(unittest.TestCase):
         self.action(folder="456")
         self.assertEqual(self.action("baseline")["status"], "cooldown")
         self.assertEqual(Source.calls, 1)
-        self.now += 300
+        self.now += 9
+        self.assertEqual(self.action("baseline")["status"], "cooldown")
+        self.assertEqual(Source.calls, 1)
+        self.now += 1
         self.action("baseline")
         self.assertEqual(Source.calls, 2)
         self.assertEqual(self.db().status()["seen"], 1)

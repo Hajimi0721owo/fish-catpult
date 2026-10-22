@@ -4,6 +4,9 @@ export const stepOf = {folder: 0, credentials: 1, bind: 2, baseline: 3, activate
 const back = '<button type="button" class="secondary" data-action="back">上一步</button>';
 const head = (n, label) => `<p class="card-head">STEP ${n} · ${label}<span>${n} / 4</span></p>`;
 
+const interval = (id) => `<div class="interval-input"><input id="${id}" type="number" min="1" max="1440" step="1" value="15" required aria-label="同步间隔数值"><select id="${id}-unit" aria-label="同步间隔单位"><option value="1">秒</option><option value="60" selected>分钟</option></select></div>`;
+const intervalHint = '最短 10 秒，最长 24 小时。短间隔更容易遇到访问限制，建议先用 15 分钟。';
+
 const folder = `${head(1, '选收藏夹')}<div class="card-body">
   <h2 id="page-title" tabindex="-1">想分享哪个收藏夹？</h2>
   <p class="intro">选一个<strong>公开</strong>的收藏夹。之后往里面收藏的视频，会转发到 QQ 群。</p>
@@ -63,7 +66,7 @@ const activate = `${head(4, '开始转发')}<div class="card-body">
   <form id="activate-form"><fieldset class="mode-cards"><legend>同步方式</legend>
       <label class="mode-card"><input type="radio" name="mode" value="manual" checked><span><strong>手动同步</strong><small>点“立即同步”或对 agent 说一声，才去看新收藏。适合先试试。</small></span></label>
       <label class="mode-card"><input type="radio" name="mode" value="auto"><span><strong>自动同步</strong><small>后台定时看一眼，有新收藏就转发。</small></span></label></fieldset>
-    <div id="interval-field"><label for="minutes">多久看一次</label><select id="minutes" name="minutes"><option value="5">每 5 分钟</option><option value="10">每 10 分钟</option><option value="15" selected>每 15 分钟</option><option value="30">每 30 分钟</option><option value="60">每小时</option></select></div>
+    <div id="interval-field"><label for="interval">多久看一次</label>${interval('interval')}<p class="hint">${intervalHint}</p></div>
     <p class="hint">点下面的按钮后，新收藏才会真的发往「<span class="group-name"></span>」。关掉页面也会继续运行；电脑重启后需要再启动一次。</p>
     <div class="actions">${back}<button type="submit" id="activate-button" disabled>开始转发</button></div>
   </form></div>`;
@@ -75,8 +78,8 @@ const ready = `<p class="card-head">后台 · 转发中控台<span>设置完成<
   <div class="stats"><div><b id="sent-count">0</b><small>已转发</small></div><div><b id="queued-count">0</b><small>等待发送</small></div><div><b id="seen-count">0</b><small>历史收藏</small></div></div>
   <dl class="summary"><div><dt>同步方式</dt><dd id="mode-value"></dd></div><div><dt>本次进度</dt><dd id="sync-value">暂无同步任务</dd></div></dl>
   <div class="actions dashboard-actions"><button type="button" data-action="sync" id="sync-button">立即同步</button><button type="button" data-action="start" id="start-button" hidden>启动后台程序</button><button type="button" class="text-button" data-action="cancel" id="cancel-button" hidden>取消本次</button><button type="button" class="text-button quiet" data-action="stop" id="stop-button">停止后台程序</button></div>
-  <form id="schedule-form" class="schedule-form"><label for="schedule-mode">修改同步方式</label><div class="inline-fields"><select id="schedule-mode"><option value="manual">手动同步</option><option value="auto">自动同步</option></select><span class="every">每</span><input id="schedule-minutes" type="number" min="5" max="1440" value="15" aria-label="自动间隔（分钟）"><span>分钟</span><button type="submit" class="secondary">保存</button></div></form>
-  <div class="tips"><div><strong>验证一下</strong><p>往收藏夹里新收藏一个短视频，再点“立即同步”。两次读取 B 站之间至少隔 5 分钟。</p></div>
+  <form id="schedule-form" class="schedule-form"><label for="schedule-mode">修改同步方式</label><div class="inline-fields"><select id="schedule-mode"><option value="manual">手动同步</option><option value="auto">自动同步</option></select><span class="every">每</span>${interval('schedule-interval')}<button type="submit" class="secondary">保存</button></div><p id="schedule-hint" class="hint">${intervalHint}</p></form>
+  <div class="tips"><div><strong>验证一下</strong><p>往收藏夹里新收藏一个短视频，再点“立即同步”。两轮读取至少隔 10 秒，遇到访问限制时会暂停。</p></div>
     <div><strong>也可以直接对 agent 说</strong><p>“现在同步新收藏”<br>“改成每 10 分钟同步”<br>“电脑重启了，启动收藏转发”</p></div></div></div>`;
 
 export const views = [folder, bot, group, activate, ready];

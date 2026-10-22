@@ -49,10 +49,40 @@ class ControlTest(unittest.TestCase):
         self.assertEqual(before, self.path.read_bytes())
 
     def test_invalid_interval_does_not_partially_change_mode(self):
-        for value in (0, 1, 4, 1441, True, 5.5):
+        for value in (0, -1, 1441, True, 5.5):
             with self.assertRaises(ValueError):
                 self.control.schedule(mode="manual", minutes=value)
         self.assertEqual(self.control.summary()["mode"], "auto")
+
+    def test_seconds_cli_persists_precisely_and_minutes_remain_compatible(self):
+        with patch("socket.socket", side_effect=AssertionError("network")):
+            code, output = self.invoke("schedule", "--seconds", "17")
+        self.assertEqual(code, 0)
+        self.assertEqual(output[-1]["interval_seconds"], 17)
+        self.assertGreater(output[-1]["interval_minutes"], 0)
+        self.assertEqual(output[-1]["minimum_interval_seconds"], 10)
+        second = Store(self.config.data_dir / "state.sqlite3")
+        try:
+            self.assertEqual(Control(self.config, second).effective().poll_seconds, 17)
+        finally:
+            second.close()
+        self.assertEqual(self.control.schedule(mode="manual")["interval_seconds"], 17)
+        self.assertEqual(self.control.schedule(minutes=1)["interval_seconds"], 60)
+        self.assertEqual(self.control.schedule(seconds=86400)["interval_seconds"], 86400)
+
+    def test_invalid_seconds_or_mixed_units_do_not_mutate_settings(self):
+        self.control.schedule(seconds=10)
+        before = self.store.get("controls")
+        for value in (0, 9, -1, 86401, True, 10.5, "10"):
+            with self.assertRaises(ValueError):
+                self.control.schedule(mode="manual", seconds=value)
+            self.assertEqual(self.store.get("controls"), before)
+        with self.assertRaises(ValueError):
+            self.control.schedule(mode="manual", minutes=1, seconds=10)
+        self.assertEqual(self.store.get("controls"), before)
+        self.assertEqual(Config.from_mapping({"folder": "1", "poll_seconds": 10}, self.path).poll_seconds, 10)
+        with self.assertRaises(ValueError):
+            Config.from_mapping({"folder": "1", "poll_seconds": 9}, self.path)
 
     def test_simultaneous_requests_coalesce(self):
         def request(_):

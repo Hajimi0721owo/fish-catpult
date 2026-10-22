@@ -6,7 +6,7 @@ import secrets
 import shutil
 import time
 import uuid
-from ..config import Config
+from ..config import Config, poll_interval
 from ..credentials import CredentialVault
 from ..core.control import Control
 from ..core.lock import WorkerLock
@@ -126,9 +126,10 @@ class SetupService:
 
     def activate(self, payload, progress):
         config = self.config()
-        mode, minutes = payload.get("mode", "manual"), payload.get("minutes", 15)
-        if mode not in {"auto", "manual"} or type(minutes) is not int or not 5 <= minutes <= 1440:
-            raise ValueError("请选择手动/自动模式与 5–1440 分钟间隔")
+        mode = payload.get("mode", "manual")
+        interval = poll_interval(minutes=payload.get("minutes"), seconds=payload.get("seconds"))
+        if mode not in {"auto", "manual"}:
+            raise ValueError("请选择手动或自动模式")
         if not all(shutil.which(name) for name in ("ffmpeg", "ffprobe")):
             raise ValueError("缺少 FFmpeg 或 ffprobe，请先按安装指南补齐")
         with WorkerLock(config.data_dir / "worker.lock"), self.store(config) as store:
@@ -137,7 +138,7 @@ class SetupService:
             load_binding(config)
             if store.get("source_paused", False) or store.get("delivery_paused", False):
                 raise ValueError("同步处于暂停状态；请先核对并解决 status 中的错误")
-            Control(config, store).schedule(mode=mode, minutes=minutes)
+            Control(config, store).schedule(mode=mode, seconds=interval)
             private_write(self.path, {**self.raw(), "send_enabled": True})
         progress(message="正在启动后台程序")
         return {"status": "started", "runtime": start_worker(self.path), "next_step": "ready"}
@@ -152,7 +153,7 @@ class SetupService:
         with self.store(config) as store:
             control = Control(config, store)
             if operation == "schedule":
-                return control.schedule(mode=payload.get("mode"), minutes=payload.get("minutes"))
+                return control.schedule(mode=payload.get("mode"), minutes=payload.get("minutes"), seconds=payload.get("seconds"))
             if operation == "cancel":
                 return control.cancel_sync()
             if operation == "sync":

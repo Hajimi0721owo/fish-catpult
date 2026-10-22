@@ -1,6 +1,7 @@
 """模式切换与有限同步任务；调度不认识来源/目标平台。"""
 import time
 from .control import ACTIVE, Control
+from ..config import MIN_BACKOFF_SECONDS
 from .pipeline import safe_error
 
 
@@ -25,7 +26,7 @@ class Scheduler:
             if request and request["status"] in ACTIVE:
                 self.store.update_sync(request["id"], **result, message="同步未完成，请查看状态后处理")
             else:
-                self.store.set("scheduler_retry_at", self.clock() + config.poll_seconds)
+                self.store.set("scheduler_retry_at", self.clock() + max(MIN_BACKOFF_SECONDS, config.poll_seconds))
             return result
 
     def automatic(self, config):

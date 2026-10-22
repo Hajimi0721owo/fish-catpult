@@ -97,14 +97,14 @@ class SchedulerTest(unittest.TestCase):
 
     def test_manual_respects_minimum_and_existing_failure_backoff(self):
         self.scheduler.tick()
-        self.now += 10
+        self.now += 9
         self.control.request_sync()
         result = self.scheduler.tick()
-        self.assertEqual(result["next_action_at"], 10300)
+        self.assertEqual(result["next_action_at"], 10010)
         self.assertEqual(self.source.calls, 1)
         self.store.set("poll_failures", 1)
         self.store.set("next_poll_at", 13000)
-        self.now = 10300
+        self.now = 10010
         self.assertEqual(self.scheduler.tick()["next_action_at"], 13000)
         self.assertEqual(self.source.calls, 1)
 
@@ -121,6 +121,40 @@ class SchedulerTest(unittest.TestCase):
         self.now += 300
         self.scheduler.tick()
         self.assertEqual(self.source.calls, 2)
+
+    def test_ten_second_schedule_observes_boundary_and_deduplicates(self):
+        self.control.schedule(seconds=10)
+        self.source.rows = [item(1)]
+        self.scheduler.tick()
+        self.source.rows.append(item(2))
+        self.now += 9
+        self.scheduler.tick()
+        self.assertEqual((self.source.calls, self.target.calls), (1, 0))
+        self.now += 1
+        self.scheduler.tick()
+        self.assertEqual((self.source.calls, self.target.calls), (2, 1))
+        self.now += 10
+        self.scheduler.tick()
+        self.assertEqual((self.source.calls, self.target.calls), (3, 1))
+
+    def test_short_interval_does_not_shorten_failure_backoff_after_restart(self):
+        self.control.schedule(seconds=10)
+        self.source.error = BiliError("network", "fixture")
+        self.scheduler.tick()
+        due = self.store.get("next_poll_at")
+        self.assertEqual(due, self.now + 600)
+        self.control.schedule(seconds=11)
+        self.store.close()
+        self.store = Store(self.root / "state.sqlite3")
+        self.scheduler = Scheduler(self.config, self.store, self.factory, lambda: self.now)
+        self.now += 11
+        self.scheduler.tick()
+        self.assertEqual(self.source.calls, 1)
+        self.assertEqual(self.store.get("next_poll_at"), due)
+        self.now = due
+        self.scheduler.tick()
+        self.assertEqual(self.source.calls, 2)
+        self.assertEqual(self.store.get("next_poll_at"), due + 1200)
 
     def test_cancel_during_current_item_preserves_remaining_queue(self):
         self.prepare_new()

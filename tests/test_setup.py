@@ -109,6 +109,27 @@ class SetupTest(unittest.TestCase):
             self.assertNotIn("secret-marker-not-in-files", file.read_text())
         self.assertNotIn("secret-marker-not-in-files", json.dumps(self.progress))
 
+    def test_seconds_activation_validation_and_status(self):
+        self.configured()
+        self.now += 10
+        self.action("baseline")
+        with patch("bili_fav_relay.setup.service.start_worker", return_value={"active": True}) as start, patch("shutil.which", return_value="/fake/tool"):
+            for payload in ({"seconds": 9}, {"seconds": 10, "minutes": 1}, {"seconds": True}):
+                with self.assertRaises(ValueError):
+                    self.action("activate", mode="auto", **payload)
+                self.assertFalse(Config.load(self.path).send_enabled)
+            start.assert_not_called()
+            self.action("activate", mode="auto", seconds=10)
+            start.assert_called_once()
+        self.assertEqual(self.service.status()["interval_seconds"], 10)
+        self.action("control", operation="schedule", seconds=17)
+        self.assertEqual(self.service.status()["interval_seconds"], 17)
+        self.action("control", operation="schedule", mode="manual")
+        self.assertEqual(self.service.status()["interval_seconds"], 17)
+        with self.assertRaises(ValueError):
+            self.action("control", operation="schedule", mode="auto", seconds=0)
+        self.assertEqual(self.service.status()["mode"], "manual")
+
     def test_setup_status_does_not_open_vault_or_contact_network(self):
         self.configured()
         with patch("bili_fav_relay.credentials.CredentialVault.load", side_effect=AssertionError("secret access")), patch("socket.socket", side_effect=AssertionError("network")):

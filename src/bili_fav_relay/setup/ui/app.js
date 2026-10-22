@@ -20,7 +20,26 @@ function notice(message, tone = 'error', action) {
   text('notice', message); show('notice', !!message); $('notice').className = tone;
   speak();
 }
-function clock(value) { return new Date(value * 1000).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit', hour12: false}); }
+function clock(value) { return new Date(value * 1000).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false}); }
+function intervalLabel() {
+  const seconds = state.interval_seconds;
+  return seconds % 60 === 0 ? `${seconds / 60} 分钟` : `${seconds} 秒`;
+}
+function intervalLimits(id, enabled = true) {
+  const input = $(id), unit = $(`${id}-unit`);
+  input.disabled = unit.disabled = !enabled;
+  input.min = unit.value === '60' ? 1 : 10;
+  input.max = unit.value === '60' ? 1440 : 86400;
+}
+function setIntervalInput(id) {
+  const minutes = state.interval_seconds % 60 === 0;
+  $(`${id}-unit`).value = minutes ? '60' : '1';
+  $(id).value = state.interval_seconds / (minutes ? 60 : 1);
+  intervalLimits(id);
+}
+function intervalPayload(id, mode) {
+  return mode === 'auto' ? {seconds: Number($(id).value) * Number($(`${id}-unit`).value)} : {};
+}
 function folderName() {
   if (!state.folder) return '';
   const title = state.folder_title ? `「${state.folder_title}」` : `收藏夹 ${state.folder}`;
@@ -40,7 +59,7 @@ function speak() {
 }
 function details() {
   return [folderName() || '还没选', state.bot?.name || '还没连接', state.binding?.alias || '还没绑定',
-    state.send_enabled ? (state.mode === 'manual' ? '手动同步' : `每 ${state.interval_minutes} 分钟`) : '还没开始'];
+    state.send_enabled ? (state.mode === 'manual' ? '手动同步' : `每 ${intervalLabel()}`) : '还没开始'];
 }
 function renderSteps() {
   const active = Math.min(current, 3), done = stepOf[state.next_step], info = details();
@@ -67,9 +86,10 @@ function navigate(step, focus = true) {
   $('content').innerHTML = views[step];
   if (step === 0) $('folder').value = state.folder || '';
   if (step === 1 && !state.bot) $('bot-guide').open = true;
+  if (step === 3) setIntervalInput('interval');
   if (step === 4) {
     $('schedule-mode').value = state.mode;
-    $('schedule-minutes').value = state.interval_minutes;
+    setIntervalInput('schedule-interval');
   }
   update();
   if (focus) $('page-title').focus({preventScroll: matchMedia('(min-width: 981px)').matches});
@@ -128,7 +148,8 @@ function updateActivate() {
   const missing = Object.entries(state.tools).filter(([, ready]) => !ready).map(([name]) => name);
   show('dependency-warning', !!missing.length);
   text('dependency-warning', `这台电脑还缺 ${missing.join('、')}。请让 agent 安装 FFmpeg，装好后这里会自动更新。`);
-  show('interval-field', document.querySelector('input[name=mode]:checked')?.value === 'auto');
+  const auto = document.querySelector('input[name=mode]:checked')?.value === 'auto';
+  show('interval-field', auto); intervalLimits('interval', auto);
   $('activate-button').disabled = busy || !baseline || !state.binding || !state.bot || !!missing.length;
 }
 function updateReady() {
@@ -136,7 +157,7 @@ function updateReady() {
   text('runtime-value', stopping ? '正在停止…' : running ? '后台运行中' : '后台已停止');
   $('runtime-pill').className = `pill ${stopping ? 'pending' : running ? 'on' : 'off'}`;
   text('page-title', running ? '设置完成，正在为你转发' : '设置完成，后台还没运行');
-  text('mode-value', state.mode === 'manual' ? '手动同步' : `每 ${state.interval_minutes} 分钟自动同步`);
+  text('mode-value', state.mode === 'manual' ? '手动同步' : `每 ${intervalLabel()}自动同步`);
   const counts = state.counts || {};
   text('sent-count', counts.sent || 0); text('queued-count', counts.queued || 0); text('seen-count', state.seen || 0);
   const sync = state.control?.sync;
@@ -146,7 +167,8 @@ function updateReady() {
   show('cancel-button', sync && ['pending', 'running', 'waiting'].includes(sync.status));
   $('sync-button').disabled = busy || !running || state.control?.source_paused || state.control?.delivery_paused;
   const auto = $('schedule-mode').value === 'auto';
-  all('.inline-fields .every, #schedule-minutes, #schedule-minutes + span').forEach(node => { node.hidden = !auto; });
+  all('.inline-fields .every, .inline-fields .interval-input, #schedule-hint').forEach(node => { node.hidden = !auto; });
+  intervalLimits('schedule-interval', auto);
 }
 async function refresh() {
   try {
@@ -181,11 +203,17 @@ document.addEventListener('submit', (event) => {
   if (id === 'folder-form') submit('folder', {folder: $('folder').value});
   if (id === 'credentials-form') submit('credentials', {app_id: $('app-id').value, secret: $('secret').value});
   if (id === 'bind-form') submit('bind', {alias: $('alias').value});
-  if (id === 'activate-form') submit('activate', {mode: new FormData(event.target).get('mode'), minutes: Number($('minutes').value)});
-  if (id === 'schedule-form') submit('control', {operation: 'schedule', mode: $('schedule-mode').value, minutes: Number($('schedule-minutes').value)});
+  if (id === 'activate-form') {
+    const mode = new FormData(event.target).get('mode');
+    submit('activate', {mode, ...intervalPayload('interval', mode)});
+  }
+  if (id === 'schedule-form') {
+    const mode = $('schedule-mode').value;
+    submit('control', {operation: 'schedule', mode, ...intervalPayload('schedule-interval', mode)});
+  }
 });
 document.addEventListener('change', (event) => {
-  if (event.target.name === 'mode' || event.target.id === 'schedule-mode') update();
+  if (event.target.name === 'mode' || event.target.id === 'schedule-mode' || event.target.id.endsWith('-unit')) update();
 });
 document.addEventListener('click', async (event) => {
   const button = event.target.closest('button');
