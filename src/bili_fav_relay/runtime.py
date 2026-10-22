@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import sys
 import time
+import uuid
 from .config import Config
 from .core.lock import WorkerBusy, WorkerLock, read_owner
 from .store import Store
@@ -50,14 +51,16 @@ def start_worker(config_path):
         fd = os.open(log_path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
         with os.fdopen(fd, "ab") as log:
             argv = [sys.executable, "-m", "bili_fav_relay", "--config", str(config_path), "run"]
+            launch_id = uuid.uuid4().hex
+            child_env = {**os.environ, "BILI_RELAY_LAUNCH_ID": launch_id}
             if os.name != "nt":
                 actions = [(os.POSIX_SPAWN_OPEN, 0, os.devnull, os.O_RDONLY, 0o600),
                            (os.POSIX_SPAWN_DUP2, log.fileno(), 1), (os.POSIX_SPAWN_DUP2, log.fileno(), 2)]
-                pid = os.posix_spawn(sys.executable, argv, dict(os.environ), file_actions=actions, setsid=True)
+                pid = os.posix_spawn(sys.executable, argv, child_env, file_actions=actions, setsid=True)
                 def exited():
                     return os.waitpid(pid, os.WNOHANG)[0] == pid
             else:
-                proc = subprocess.Popen(argv, cwd=config_path.parent, stdin=subprocess.DEVNULL, stdout=log, stderr=log,
+                proc = subprocess.Popen(argv, cwd=config_path.parent, env=child_env, stdin=subprocess.DEVNULL, stdout=log, stderr=log,
                                         creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP)
                 _windows_children.append(proc)
                 pid = proc.pid
@@ -68,7 +71,7 @@ def start_worker(config_path):
             if exited():
                 raise ValueError("后台进程启动失败，请查看 data/worker.log；未宣称同步已启动")
             status = runtime_status(config)
-            if status.get("pid") == pid and status["active"] and status.get("last_tick_at"):
+            if status.get("session_id") == launch_id and status["active"] and status.get("last_tick_at"):
                 return {**status, "log": str(log_path), "starts_at_login": False}
             time.sleep(0.1)
         raise ValueError("后台进程尚未确认就绪，请先查看 status，勿重复启动")

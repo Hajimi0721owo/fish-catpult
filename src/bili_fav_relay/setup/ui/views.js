@@ -31,7 +31,7 @@ const bot = `${head(2, '连接机器人')}<div class="card-body">
       <li>在机器人后台的<b>开发设置</b>里复制 <b>AppID</b>，生成 <b>AppSecret</b>（只显示一次，先存好）。</li>
       <li>同一页的 <b>IP 白名单</b>里加上这台电脑的公网 IP（浏览器搜“我的 IP”可以查到）。</li>
       <li>机器人还没上线时，到<b>沙箱配置</b>把目标 QQ 群加进去。</li>
-      <li>在目标群的群设置里添加这个机器人。</li></ol>
+      <li>在目标群添加机器人，并在群内机器人设置中开启<b>主动发言</b>权限；没有操作权限时请联系群主或管理员。</li></ol>
     <p class="hint">菜单名称以平台页面为准。能否主动发视频，以绑定和第一次转发的实际结果为准。</p></details>
   <form id="credentials-form"><label for="app-id">AppID</label>
     <input id="app-id" name="app_id" inputmode="numeric" pattern="[0-9]+" required autocomplete="off" placeholder="一串数字，例如 102xxxxxx">
@@ -53,7 +53,7 @@ const group = `${head(3, '绑定 QQ 群')}<div class="card-body">
       <p><span id="code-expiry"></span> · 收到后自动进入下一步</p>
       <button type="button" class="secondary" data-action="copy-code">复制口令</button>
     </div>
-    <p class="hint">绑定不会往群里发任何消息或视频。</p>
+    <p class="hint">绑定不会往群里发任何消息或视频。请在目标 QQ 群开启机器人的“主动发言”权限；绑定成功不代表群已允许主动发视频。</p>
     <div class="actions">${back}<button type="submit" id="bind-button">生成口令</button><button type="button" id="skip-binding" data-action="next" hidden>下一步</button></div>
   </form></div>`;
 
@@ -67,7 +67,7 @@ const activate = `${head(4, '开始转发')}<div class="card-body">
       <label class="mode-card"><input type="radio" name="mode" value="manual" checked><span><strong>手动同步</strong><small>点“立即同步”或对 agent 说一声，才去看新收藏。适合先试试。</small></span></label>
       <label class="mode-card"><input type="radio" name="mode" value="auto"><span><strong>自动同步</strong><small>后台定时看一眼，有新收藏就转发。</small></span></label></fieldset>
     <div id="interval-field"><label for="interval">多久看一次</label>${interval('interval')}<p class="hint">${intervalHint}</p></div>
-    <p class="hint">点下面的按钮后，新收藏才会真的发往「<span class="group-name"></span>」。关掉页面也会继续运行；电脑重启后需要再启动一次。</p>
+    <p class="hint">请先在目标 QQ 群开启机器人的“主动发言”权限。点下面的按钮后，新收藏才会真的发往「<span class="group-name"></span>」。关掉页面也会继续运行；电脑重启后需要再启动一次。</p>
     <div class="actions">${back}<button type="submit" id="activate-button" disabled>开始转发</button></div>
   </form></div>`;
 
@@ -77,6 +77,7 @@ const ready = `<p class="card-head">后台 · 转发中控台<span>设置完成<
   <p class="intro route-summary"></p>
   <div class="stats"><div><b id="sent-count">0</b><small>已转发</small></div><div><b id="queued-count">0</b><small>等待发送</small></div><div><b id="seen-count">0</b><small>历史收藏</small></div></div>
   <dl class="summary"><div><dt>同步方式</dt><dd id="mode-value"></dd></div><div><dt>本次进度</dt><dd id="sync-value">暂无同步任务</dd></div></dl>
+  <div id="delivery-warning" class="inset warning" hidden><strong>转发已暂停</strong><p id="delivery-reason"></p></div>
   <div class="actions dashboard-actions"><button type="button" data-action="sync" id="sync-button">立即同步</button><button type="button" data-action="start" id="start-button" hidden>启动后台程序</button><button type="button" class="text-button" data-action="cancel" id="cancel-button" hidden>取消本次</button><button type="button" class="text-button quiet" data-action="stop" id="stop-button">停止后台程序</button></div>
   <form id="schedule-form" class="schedule-form"><label for="schedule-mode">修改同步方式</label><div class="inline-fields"><select id="schedule-mode"><option value="manual">手动同步</option><option value="auto">自动同步</option></select><span class="every">每</span>${interval('schedule-interval')}<button type="submit" class="secondary">保存</button></div><p id="schedule-hint" class="hint">${intervalHint}</p></form>
   <div class="tips"><div><strong>验证一下</strong><p>往收藏夹里新收藏一个短视频，再点“立即同步”。两轮读取至少隔 10 秒，遇到访问限制时会暂停。</p></div>

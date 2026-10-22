@@ -84,12 +84,18 @@ class WorkerProcessTest(unittest.TestCase):
                     self.assertEqual(status["control"]["mode"], "manual")
                     self.assertEqual((root / "source-calls.txt").read_text(), "scan\n")
                 finally:
-                    proc.terminate()
                     try:
-                        proc.wait(timeout=5)
-                    except subprocess.TimeoutExpired:
-                        proc.kill()
-                        proc.wait(timeout=5)
+                        # Stop the actual worker, including when Python uses a launcher process.
+                        command("stop")
+                        proc.wait(timeout=8)
+                    finally:
+                        if proc.poll() is None:
+                            proc.terminate()
+                            try:
+                                proc.wait(timeout=5)
+                            except subprocess.TimeoutExpired:
+                                proc.kill()
+                                proc.wait(timeout=5)
 
 
 if __name__ == "__main__":

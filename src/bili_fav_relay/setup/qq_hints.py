@@ -1,6 +1,6 @@
 """把 QQ 开放平台的错误码翻译成用户能处理的下一步；只使用数字码，不回显响应原文。"""
 import re
-from ..targets.errors import QQBotError
+from ..targets.errors import QQBotError, GROUP_PERMISSION_HINT
 
 
 def qq_reason(error, stage="验证"):
@@ -13,7 +13,9 @@ def qq_reason(error, stage="验证"):
     if "事件权限" in message:
         return "QQ 拒绝了消息通道。请在机器人后台确认已开通群聊 @ 消息事件，再重新生成口令。"
     match = re.search(r"rejected: (-?\d+)", message)
-    code = int(match.group(1)) if match else None
+    code = error.code if error.code is not None else (int(match.group(1)) if match else None)
+    if code == 40034105:
+        return GROUP_PERMISSION_HINT
     if code == 11298:
         return ("QQ 开放平台拒绝了这台电脑的 IP（11298）。在机器人后台“开发设置 → IP 白名单”"
                 "添加本机公网 IP 后再试；家里宽带的 IP 变了也要重新添加。")

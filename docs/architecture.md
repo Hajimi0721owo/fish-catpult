@@ -70,3 +70,7 @@
 ## 秒级同步间隔
 
 用户任务仍在向导启用页与完成页：选择手动/自动，输入数值与秒/分钟单位。沿用像素直播间样式。config.py 统一校验 10–86400 秒，Control 保存秒值；CLI/SetupService 将输入交给同一规则，setup-status 同时提供秒值和兼容分钟字段。SourceAccess 保留分页预算、持久失败退避与风控暂停，Scheduler 串行执行，不增加并发请求。默认 900 秒和现有用户配置不自动改变。
+
+## 设置会话恢复与明确投递拒绝
+
+会话恢复仍在 setup/ui/app.js：同标签页带 token 的 hash 变化触发重新加载，沿用服务端会话认证。targets 层保留 QQ 数字码/HTTP 状态并把已知权限拒绝映射为 core/delivery_errors.py 中的通用异常；core/Pipeline 只区分明确拒绝与结果不明，不识别平台错误码。Store 的现有 meta 保存脱敏投递原因，Control/status 投影到 CLI 和页面；不新增数据表、不迁移旧 uncertain、不在权限恢复时自动重发。群内权限指引放在绑定页、启动页和部署文档。

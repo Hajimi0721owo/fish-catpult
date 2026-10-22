@@ -22,7 +22,8 @@ def make_pipeline(config, store):
 def run_worker(config, store, emit, once=False, request_id=None):
     scheduler = Scheduler(config, store, lambda cfg: make_pipeline(cfg, store))
     previous = None
-    session = {"id": uuid.uuid4().hex, "pid": os.getpid(), "active": True, "started_at": time.time()}
+    session = {"id": os.environ.pop("BILI_RELAY_LAUNCH_ID", "") or uuid.uuid4().hex,
+               "pid": os.getpid(), "active": True, "started_at": time.time()}
     store.set("worker_session", session)
     store.set("last_cycle_at", None)
     write_owner(config.data_dir / "worker.lock", {"id": session["id"], "pid": session["pid"], "kind": "worker"})

@@ -6,13 +6,14 @@ import threading
 import unittest
 from bili_fav_relay.setup.server import SetupServer
 from bili_fav_relay.setup.service import SetupService
+from test_setup import FakeSource
 
 
 class SetupServerTest(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.path = Path(self.temp.name) / "config.json"
-        self.server = SetupServer(SetupService(self.path))
+        self.server = SetupServer(SetupService(self.path, source_factory=FakeSource))
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
 
