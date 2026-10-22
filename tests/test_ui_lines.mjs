@@ -45,3 +45,23 @@ assert.match(pick({...ready, state: {...ready.state, control: {source_paused: tr
 const recovered = {...ready.state, source_access: {cooling: true, error: '', next_poll_at: retryAt}};
 assert.doesNotMatch(pick({...ready, state: recovered}).text, /分页结果前后不一致/);
 console.log('Source failure backoff, normal polling and video delivery waits stay distinct.');
+
+const permission = '请到目标 QQ 群开启机器人的主动发言权限';
+const paused = pick({...pending, state: {control: {delivery_paused: true, delivery_problem: {message: permission}}}, step: 4});
+assert.equal(paused.text, permission);
+assert.equal(paused.alert, true);
+console.log('Paused delivery shows the safe permission recovery hint.');
+
+// 停止请求已接受但进程尚未退出，不能仍许诺下一轮自动处理。
+for (const state of [ready.state, manual, normal, delivery, recovered]) {
+  const stopping = {...state, runtime: {active: true, status: 'stopping'}};
+  const line = pick({...ready, state: stopping});
+  assert.match(line.text, /后台正在停止/);
+  assert.doesNotMatch(line.text, /自动重试|后台会继续处理|开工啦/);
+  assert.match(line.text, /重新启动后台/);
+}
+const permissionAndWait = {...ready.state, runtime: {active: true, status: 'stopping'},
+  control: {delivery_paused: true, delivery_problem: {message: permission}}};
+assert.equal(pick({...ready, state: permissionAndWait}).text, permission);
+assert.match(pick(ready).text, /自动重试/);
+console.log('Stopping never promises another attempt; permission recovery keeps priority.');

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Callable
 from .qq_upload import UploadMixin
 
-from .errors import QQBotError
+from .errors import QQBotError, numeric_code
 
 
 
@@ -20,8 +20,8 @@ def _body_code(error):
         result = json.loads(error.read(65536).decode("utf-8", errors="replace") or "{}")
     except (OSError, ValueError):
         return None
-    code = result.get("code", result.get("err_code")) if isinstance(result, dict) else None
-    return code if type(code) is int else None
+    code = result.get("code", result.get("err_code", result.get("errcode"))) if isinstance(result, dict) else None
+    return numeric_code(code)
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
@@ -85,7 +85,7 @@ class QQBotClient(UploadMixin):
         except urllib.error.HTTPError as error:
             code = _body_code(error)
             suffix = f" rejected: {code}" if code is not None else ""
-            raise QQBotError(f"QQ API HTTP {error.code}{suffix}") from None
+            raise QQBotError(f"QQ API HTTP {error.code}{suffix}", http_status=error.code, code=code) from None
         except urllib.error.URLError as error:
             raise QQBotError("QQ API network error") from None
         try:
@@ -96,7 +96,8 @@ class QQBotClient(UploadMixin):
             raise QQBotError("QQ Bot 返回格式不是 JSON 对象")
         error_code = result.get("err_code", result.get("code", result.get("errcode")))
         if error_code not in (None, 0, "0"):
-            raise QQBotError(f"QQ API rejected: {error_code}")
+            code = numeric_code(error_code)
+            raise QQBotError(f"QQ API rejected: {code}" if code is not None else "QQ API rejected", code=code)
         return result
 
     def access_token(self, *, force_refresh: bool = False) -> str:

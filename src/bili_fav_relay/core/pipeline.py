@@ -1,6 +1,7 @@
 """源与目标均通过接口传入；每次轮询有预算，失败不得污染基线。"""
 import time
 from .source_access import SourceAccess
+from .delivery_errors import DeliveryError, delivery_details
 
 
 def safe_error(error):
@@ -46,15 +47,21 @@ class Pipeline:
             self.store.transition(item_id, "failed", kind)
             # 权限、风控、上传拒绝不会在下一条视频继续轰接口。
             self.store.set("delivery_paused", True)
-            return {"id": item_id, "status": "failed", "error": kind}
+            problem = {"id": item_id, "status": "failed", "error": kind, **delivery_details(error)}
+            self.store.set("delivery_problem", problem)
+            return problem
         self.store.transition(item_id, "sending")
         try:
             receipt = self.target.send(prepared)
             if not isinstance(receipt, str) or not receipt:
                 raise ValueError("消息没有回执")
         except Exception as error:
-            self.store.transition(item_id, "uncertain", safe_error(error))
+            status = "failed" if isinstance(error, DeliveryError) and error.rejected else "uncertain"
+            problem = {"id": item_id, "status": status, "error": safe_error(error), **delivery_details(error)}
+            self.store.transition(item_id, status, problem["error"])
+            self.store.set("delivery_problem", problem)
             self.store.set("delivery_paused", True)
-            return {"id": item_id, "status": "uncertain", "error": safe_error(error)}
+            return problem
+        self.store.set("delivery_problem", None)
         self.store.transition(item_id, "sent", receipt=receipt)
         return {"id": item_id, "status": "sent", "receipt": receipt}

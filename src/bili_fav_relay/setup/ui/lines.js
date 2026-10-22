@@ -37,9 +37,11 @@ function sourceFailureWait(state) {
     network: '这轮未能连上 B 站，收藏夹读取没有完成。',
   };
   const sync = state.control?.sync;
-  const willRetry = state.runtime?.active && (state.mode === 'auto' || ['pending', 'waiting', 'running'].includes(sync?.status));
+  const stopping = state.runtime?.status === 'stopping';
+  const willRetry = state.runtime?.active && !stopping && (state.mode === 'auto' || ['pending', 'waiting', 'running'].includes(sync?.status));
   const at = clock(access.next_poll_at);
-  const next = willRetry ? `程序将在 ${at} 后自动重试。` : state.runtime?.active
+  const next = stopping ? `后台正在停止；${at} 后如需重试，请重新启动后台并点击“立即同步”。`
+    : willRetry ? `程序将在 ${at} 后自动重试。` : state.runtime?.active
     ? `${at} 后可点击“立即同步”再次读取。` : `${at} 后可再次读取；请先启动后台并点击“立即同步”。`;
   return {who: 'dsf', expr: 'surprised', alert: true,
     text: (reasons[access.error] || '这轮收藏夹读取未完成。') + next};
@@ -62,11 +64,17 @@ export function pick({state, step, job, busy, since, flash}) {
   }
   if (step === 4) {
     const control = state.control || {};
+    if (control.delivery_paused && control.delivery_problem?.message) {
+      return {who: 'dsf', expr: 'sad', alert: true, text: control.delivery_problem.message};
+    }
     if (control.source_paused || control.delivery_paused) {
       return {who: 'dsf', expr: 'sad', alert: true, text: '同步先暂停了。请让 agent 看一下 status 里的原因，处理好再恢复；没确认送到的视频不会自动重发。'};
     }
     const sourceWait = sourceFailureWait(state);
     if (sourceWait) return sourceWait;
+    if (state.runtime?.status === 'stopping') {
+      return {who: 'dsf', text: '后台正在停止，当前处理结束后退出。需要继续同步时，请重新启动后台。'};
+    }
     if (state.runtime.last_result?.status === 'failed') {
       return {who: 'dsf', expr: 'surprised', alert: true, text: '后台在跑，但上一轮同步没成功。让 agent 看一下 status 里的具体原因吧。'};
     }

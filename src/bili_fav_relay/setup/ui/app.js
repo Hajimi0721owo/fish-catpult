@@ -11,6 +11,10 @@ if (initialToken) {
   history.replaceState(null, '', '/');
 }
 const token = sessionStorage.getItem('setup-token') || '';
+// 地址栏只补上 #token 时不会重跑模块；重载后沿用启动解析与服务端鉴权。
+window.addEventListener('hashchange', () => {
+  if (new URLSearchParams(location.hash.slice(1)).get('token')) location.reload();
+});
 let state = null, current = -1, handledJob = '', busy = false, submitting = false, since = 0, flash = null;
 function text(id, value) { if ($(id)) $(id).textContent = value; }
 function show(id, visible) { if ($(id)) $(id).hidden = !visible; }
@@ -84,8 +88,10 @@ function renderSteps() {
   }));
   text('hud-progress', `进度 ${Math.min(done, 4)}/4`);
   const live = done >= 4 && state.runtime.active;
-  text('hud-live', live ? 'LIVE · 转发中' : done >= 4 ? '已下播' : '设置中');
-  $('hud-live').parentElement.classList.toggle('off', done >= 4 && !live);
+  const stopping = state.runtime.status === 'stopping';
+  const paused = state.control?.source_paused || state.control?.delivery_paused;
+  text('hud-live', live ? (stopping ? '正在停止' : paused ? '转发已暂停' : 'LIVE · 转发中') : done >= 4 ? '已下播' : '设置中');
+  $('hud-live').parentElement.classList.toggle('off', done >= 4 && (!live || paused || stopping));
 }
 function navigate(step, focus = true) {
   current = step;
@@ -162,16 +168,20 @@ function updateReady() {
   const running = state.runtime.active, stopping = state.runtime.status === 'stopping';
   text('runtime-value', stopping ? '正在停止…' : running ? '后台运行中' : '后台已停止');
   $('runtime-pill').className = `pill ${stopping ? 'pending' : running ? 'on' : 'off'}`;
-  text('page-title', running ? '设置完成，正在为你转发' : '设置完成，后台还没运行');
+  const paused = state.control?.source_paused || state.control?.delivery_paused;
+  text('page-title', stopping ? '设置完成，后台正在停止' : running ? (paused ? '设置完成，转发已暂停' : '设置完成，正在为你转发') : '设置完成，后台还没运行');
   text('mode-value', state.mode === 'manual' ? '手动同步' : `每 ${intervalLabel()}自动同步`);
+  const problem = state.control?.delivery_problem;
+  show('delivery-warning', !!problem?.message); text('delivery-reason', problem?.message || '');
   const counts = state.counts || {};
   text('sent-count', counts.sent || 0); text('queued-count', counts.queued || 0); text('seen-count', state.seen || 0);
   const sync = state.control?.sync;
   const labels = {pending: '已排队', running: '正在同步', waiting: '等待冷却', completed: '本次已完成', cancelled: '本次已取消', blocked: '需要处理', failed: '同步未完成'};
-  text('sync-value', sync ? `${labels[sync.status] || sync.status}${sync.next_action_at ? ` · ${clock(sync.next_action_at)} 后继续` : ''} · 已发 ${sync.counts?.sent || 0}/${sync.total || 0}` : '暂无同步任务');
+  const next = sync?.next_action_at ? ` · ${clock(sync.next_action_at)} 后${running && !stopping ? '继续' : '可继续（需启动后台）'}` : '';
+  text('sync-value', sync ? `${labels[sync.status] || sync.status}${next} · 已发 ${sync.counts?.sent || 0}/${sync.total || 0}` : '暂无同步任务');
   show('start-button', !running); show('stop-button', running && !stopping); show('sync-button', running);
   show('cancel-button', sync && ['pending', 'running', 'waiting'].includes(sync.status));
-  $('sync-button').disabled = busy || !running || state.control?.source_paused || state.control?.delivery_paused;
+  $('sync-button').disabled = busy || !running || stopping || state.control?.source_paused || state.control?.delivery_paused;
   const auto = $('schedule-mode').value === 'auto';
   all('.inline-fields .every, .inline-fields .interval-input, #schedule-hint').forEach(node => { node.hidden = !auto; });
   intervalLimits('schedule-interval', auto);
