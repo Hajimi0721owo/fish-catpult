@@ -35,6 +35,7 @@
 
 - `queued` / `pending`：任务已提交，尚未完成。命令退出码 0 只说明提交成功。
 - `waiting`：正在冷却，按 `next_action_at` 换算用户时区，告诉用户预计何时继续；不可写成没有新增。
+- 用户反馈“10 秒设置后却要等待数分钟”时，先核对 `interval_seconds` 与 `poll_error`。`favorite_changed` 表示本轮分页前后不一致，不等于确认被平台限流；设置已保存也仍需遵守失败退避，不重启、不清除记录来提前请求。
 - `running`：按 `total` 和 `counts.sent` 描述本次进度。不要把历史累计 sent 当作本次数量。
 - `completed`：读取本次 `sync.scan` / `sync.counts`。首次基线应说“已记录已有收藏，之后只转发新增”；空队列说“没有新增待发视频”；有 sent 说“QQ 接口确认发送 N 条”，不要冒称用户实际看到了。
 - `failed` / `blocked`：本次未全部完成，说明 `counts` 中已发/待发/失败数量。`uncertain` 必须让用户核对群，不盲目重试。
