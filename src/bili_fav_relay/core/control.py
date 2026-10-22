@@ -49,6 +49,7 @@ class Control:
                 "next_auto_scan_at": due if config.sync_mode == "auto" else None,
                 "source_paused": self.store.get("source_paused", False),
                 "delivery_paused": self.store.get("delivery_paused", False),
+                "delivery_problem": self.store.get("delivery_problem") if self.store.get("delivery_paused", False) else None,
                 "sync": public_request,
                 "note": "模式与间隔已保存；自动执行需要运行中的 worker，当前一条处理完后应用新模式"}
 

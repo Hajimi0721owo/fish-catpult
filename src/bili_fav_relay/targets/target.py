@@ -1,6 +1,8 @@
 """绑定文件锁定机器人身份；准备媒体不会发送消息。"""
 import json
 from .qqbot import QQBotClient
+from .errors import QQBotError, GROUP_PERMISSION_HINT
+from ..core.delivery_errors import DeliveryError
 
 
 def load_binding(config):
@@ -27,4 +29,11 @@ class Target:
         return self.client.upload_group_video(self.group, path)["file_info"]
 
     def send(self, file_info):
-        return str(self.client.send_group_media(self.group, file_info).get("id") or "")
+        try:
+            return str(self.client.send_group_media(self.group, file_info).get("id") or "")
+        except QQBotError as error:
+            # 仅已知的业务拒绝可确认未送达；5xx 即使携带相同码仍按结果不明处理。
+            rejected = error.code == 40034105 and (error.http_status is None or 400 <= error.http_status < 500)
+            message = GROUP_PERMISSION_HINT if rejected else "QQ 未确认发送结果。请先核对目标群是否收到视频，再处理送达不明的任务。"
+            raise DeliveryError("target_permission_denied" if rejected else "target_error", message,
+                                rejected=rejected, http_status=error.http_status, code=error.code) from None

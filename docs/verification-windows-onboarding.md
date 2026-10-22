@@ -17,3 +17,7 @@ node tests/test_ui_lines.mjs
 ```
 
 83 项 Python 测试及 JavaScript 台词回归通过。上述修复后的完整测试使用离线平台替身，浏览器验证只访问本机设置服务。未在本轮测试真实 QQ 群投递，也未在 Linux/macOS 实机复测这些修改。Node.js 仅用于可选的开发测试，普通安装与运行仍不依赖 Node.js。
+
+## 后续补修
+
+补齐同标签页只改变 #token 时的恢复：页面自动重新载入，继续使用服务端会话鉴权。另根据用户确认补充 QQ 群内主动发言权限说明，并将明确的 40034105 拒绝与不确定发送结果分开处理。补修后的 macOS 90 项 Python 测试、JavaScript 及浏览器验证见 `verification.md`；尚未在 Windows 上重跑新增修复，不能把原 83 项结果当作本轮 Windows 验收。

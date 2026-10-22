@@ -10,3 +10,9 @@ assert.equal(failed.text, message);
 assert.equal(failed.alert, true);
 assert.equal(failed.expr, 'sad');
 console.log('Startup errors remain visible before configuration is loaded.');
+
+const permission = '请到目标 QQ 群开启机器人的主动发言权限';
+const paused = pick({...pending, state: {control: {delivery_paused: true, delivery_problem: {message: permission}}}, step: 4});
+assert.equal(paused.text, permission);
+assert.equal(paused.alert, true);
+console.log('Paused delivery shows the safe permission recovery hint.');
