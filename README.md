@@ -125,7 +125,7 @@
 
 **极速部署**：在你的 agent 里发送：
 
-> 帮我部署 https://github.com/bigapple233/fish-catpult ，按仓库里的 README_AGENT.md 完成安装，并引导我打开本地设置向导。
+> 帮我部署 https://github.com/Hajimi0721owo/fish-catpult ，按仓库里的 README_AGENT.md 完成安装，并引导我打开本地设置向导。
 
 也可以手动装：
 
