@@ -252,4 +252,4 @@ bili-fav-relay backup --output /安全位置/relay-state.sqlite3
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-来源与验证见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)。本项目按 [MIT 许可证](LICENSE) 开放，包含代码、文档和仓库内图片，来源声明见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。当前适合作为开发版分享；长期运行、干净机器与跨平台安装验收仍待完成，详见验证文档。本目录可以独立打包；不要把 `.local/`、`data/`、`.env` 或 `config.json` 上传 GitHub。
+验证状态见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)，设计取舍见 [docs/adr.md](docs/adr.md)。本项目按 [MIT 许可证](LICENSE) 开放，包含代码、文档和仓库内图片，来源声明见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。当前是开发版；长期运行、干净机器与跨平台安装验收仍待完成，详见验证文档。如果你 fork 后提交改动，不要把 `data/`、`.env`、`config.json` 等本地运行文件提交上去（`.gitignore` 已排除）。

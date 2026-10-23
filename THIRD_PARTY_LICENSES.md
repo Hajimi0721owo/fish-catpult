@@ -1,6 +1,6 @@
 # QQ 模块来源
 
-基于 dy-archive experiment/ux-polish 工作区（含未提交修改，读取日期 2026-10-22）的 qqbot.py、qqbot_gateway.py、worker_lock.py 改编。
+改编自 dy-archive 项目（experiment/ux-polish 分支）的 qqbot.py、qqbot_gateway.py、worker_lock.py。
 
 MIT License
 
@@ -27,11 +27,11 @@ SOFTWARE.
 
 # B 站下载模块
 
-来源：维护者的 bilibili-public-download Skill 中的 bili_api.py / download.py，2026-10-22 复制并适配。维护者于同日确认由其与 AI 共同编写，并将本项目整体按 MIT 许可证开放；这部分代码适用根目录 LICENSE。
+来源：维护者自己的 bilibili-public-download 工具中的 bili_api.py / download.py（维护者与 AI 共同编写），复制并适配。这部分代码适用根目录 LICENSE。
 
 # 页面角色与宣传素材
 
-页面的哈基米、大肥鱼像素图及 docs/assets/ 中的横幅、角色图、演示截图，随维护者确认的全项目开源范围按根目录 LICENSE 分发。使用、修改或再分发时保留许可证与版权声明。该许可覆盖本仓库中的文件，不授予第三方商标权，也不表示相关平台对项目的认可。
+页面的哈基米、大肥鱼像素图及 docs/assets/ 中的横幅、角色图、演示截图，按根目录 LICENSE 分发。使用、修改或再分发时保留许可证与版权声明。该许可覆盖本仓库中的文件，不授予第三方商标权，也不表示相关平台对项目的认可。
 
 # 外部依赖
 

@@ -10,9 +10,11 @@ const INTRO = [
   (s) => s.baseline
     ? {who: 'dsf', expr: 'happy', text: `${s.seen} 个旧收藏都记好啦，一个都不会补发。选好节奏，就可以开工了！`}
     : {who: 'dsf', text: '最后一步！先让我把已有的收藏记下来——只看列表，不下载、不发视频。'},
-  (s) => s.runtime.active
-    ? {who: 'hachi', expr: 'happy', other: 'happy', text: '开工啦！之后往收藏夹里放新视频，我们就把它送进群里喵～'}
-    : {who: 'dsf', expr: 'pout', text: '后台还没在跑哦。点“启动后台程序”，我们就上班！电脑重启后也要再点一次。'},
+  (s) => !s.runtime.active
+    ? {who: 'dsf', expr: 'pout', text: '后台还没在跑哦。点“启动后台程序”，我们就上班！电脑重启后也要再点一次。'}
+    : s.mode === 'manual'
+      ? {who: 'hachi', expr: 'happy', other: 'happy', text: '投石机待命中！手动模式不会自己去巡逻，放好新视频后点“立即同步”，本喵就发射喵～'}
+      : {who: 'hachi', expr: 'happy', other: 'happy', text: '开工啦！之后往收藏夹里放新视频，我们就把它送进群里喵～'},
 ];
 
 // 每一步完成时，由负责这一步的角色用自己的口气说结果。

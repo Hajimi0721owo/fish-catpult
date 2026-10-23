@@ -65,3 +65,9 @@ const permissionAndWait = {...ready.state, runtime: {active: true, status: 'stop
 assert.equal(pick({...ready, state: permissionAndWait}).text, permission);
 assert.match(pick(ready).text, /自动重试/);
 console.log('Stopping never promises another attempt; permission recovery keeps priority.');
+
+const idle = {mode: 'manual', interval_seconds: 900, runtime: {active: true}, control: {}};
+assert.match(pick({...pending, step: 4, state: idle}).text, /待命.*立即同步/);
+assert.doesNotMatch(pick({...pending, step: 4, state: idle}).text, /放新视频，我们就把它送进群/);
+assert.match(pick({...pending, step: 4, state: {...idle, mode: 'auto'}}).text, /送进群里/);
+console.log('Manual standby says it waits for an explicit sync instead of promising to forward.');

@@ -71,6 +71,8 @@ function details() {
   return [folderName() || '还没选', state.bot?.name || '还没连接', state.binding?.alias || '还没绑定',
     state.send_enabled ? (state.mode === 'manual' ? '手动同步' : `每 ${intervalLabel()}`) : '还没开始'];
 }
+// 手动模式且没有进行中的同步任务：后台在跑，但不会自己去读收藏夹或投递
+const standby = () => state.mode === 'manual' && !['pending', 'running', 'waiting'].includes(state.control?.sync?.status);
 function renderSteps() {
   const active = Math.min(current, 3), done = stepOf[state.next_step], info = details();
   $('steps').replaceChildren(...steps.map((label, i) => {
@@ -90,7 +92,7 @@ function renderSteps() {
   const live = done >= 4 && state.runtime.active;
   const stopping = state.runtime.status === 'stopping';
   const paused = state.control?.source_paused || state.control?.delivery_paused;
-  text('hud-live', live ? (stopping ? '正在停止' : paused ? '转发已暂停' : 'LIVE · 转发中') : done >= 4 ? '已下播' : '设置中');
+  text('hud-live', live ? (stopping ? '正在停止' : paused ? '转发已暂停' : standby() ? 'LIVE · 待命中' : 'LIVE · 转发中') : done >= 4 ? '已下播' : '设置中');
   $('hud-live').parentElement.classList.toggle('off', done >= 4 && (!live || paused || stopping));
 }
 function navigate(step, focus = true) {
@@ -169,7 +171,7 @@ function updateReady() {
   text('runtime-value', stopping ? '正在停止…' : running ? '后台运行中' : '后台已停止');
   $('runtime-pill').className = `pill ${stopping ? 'pending' : running ? 'on' : 'off'}`;
   const paused = state.control?.source_paused || state.control?.delivery_paused;
-  text('page-title', stopping ? '设置完成，后台正在停止' : running ? (paused ? '设置完成，转发已暂停' : '设置完成，正在为你转发') : '设置完成，后台还没运行');
+  text('page-title', stopping ? '设置完成，后台正在停止' : running ? (paused ? '设置完成，转发已暂停' : standby() ? '设置完成，手动模式待命中' : '设置完成，正在为你转发') : '设置完成，后台还没运行');
   text('mode-value', state.mode === 'manual' ? '手动同步' : `每 ${intervalLabel()}自动同步`);
   const problem = state.control?.delivery_problem;
   show('delivery-warning', !!problem?.message); text('delivery-reason', problem?.message || '');

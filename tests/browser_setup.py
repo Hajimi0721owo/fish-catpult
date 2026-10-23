@@ -112,6 +112,8 @@ def main():
                 page.locator("#schedule-mode").select_option("manual")
                 page.get_by_role("button", name="保存", exact=True).click()
                 expect(page.locator("#mode-value")).to_have_text("手动同步", timeout=10000)
+                expect(page.get_by_role("heading", name="设置完成，手动模式待命中")).to_be_visible()
+                expect(page.locator("#hud-live")).to_have_text("LIVE · 待命中")
                 assert service.status()["interval_seconds"] == 600
                 page.get_by_role("button", name="停止后台程序").click()
                 expect(page.locator("#runtime-value")).to_have_text("后台已停止", timeout=10000)

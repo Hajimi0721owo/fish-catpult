@@ -71,7 +71,7 @@ Windows 对应使用 `.venv\Scripts\python.exe` 和 `.venv\Scripts\bili-fav-rela
 | 重开页面显示已停止 | 点击后台启动，或 agent 调用 start；已有配置不用重新填写 |
 | 新电脑只恢复了配置文件 | 系统密钥不会随配置备份迁移，需重新填写；保留去重数据库与绑定 |
 
-仓库当前仍是开发版；发布前核对 docs/verification.md，尤其新用户真实机器人绑定和跨平台验收范围。
+仓库当前仍是开发版；已验证和未验证的范围见 [verification.md](verification.md)，尤其新用户真实机器人绑定和跨平台安装。
 
 ## 自定义同步间隔
 

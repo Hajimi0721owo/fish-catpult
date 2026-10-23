@@ -1,4 +1,4 @@
-// 两位主持：哈基米（运营）和大肥鱼。像素图来自 ds-pixel 大档原图，只换表情片，不重画。
+// 两位主持：哈基米（运营）和大肥鱼。像素图按原设定逐格导出，只换表情片，不重画。
 const NAMES = {hachi: '哈基米', dsf: '大肥鱼'};
 const EXPRS = {hachi: ['calm', 'blink', 'happy'], dsf: ['calm', 'blink', 'happy', 'surprised', 'sad', 'shy', 'pout']};
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
