@@ -20,7 +20,8 @@
 
 <p align="center">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/Python-3.11%2B-ef6b9a?style=flat-square&labelColor=2c2a4c">
-  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-8b8fe0?style=flat-square&labelColor=2c2a4c">
+  <a href="LICENSE"><img alt="Code: MIT" src="https://img.shields.io/badge/Code-MIT-8b8fe0?style=flat-square&labelColor=2c2a4c"></a>
+  <a href="ARTWORK_LICENSE.md"><img alt="Artwork: CC BY-NC-SA 4.0" src="https://img.shields.io/badge/Artwork-CC%20BY--NC--SA%204.0-3fae7f?style=flat-square&labelColor=2c2a4c"></a>
   <img alt="版本 0.1 开发版" src="https://img.shields.io/badge/%E7%89%88%E6%9C%AC-0.1%20%E5%BC%80%E5%8F%91%E7%89%88-e2434f?style=flat-square&labelColor=2c2a4c">
 </p>
 
@@ -202,4 +203,6 @@ bili-fav-relay resume
 
 鱼猫投石机是「哈基米 × 大肥鱼」系列的番外：中控室沿用了系列直播间的粉墙、彩旗、LIVE 角标和名字签对话框，台词都在 [`setup/ui/lines.js`](src/bili_fav_relay/setup/ui/lines.js)。
 
-本项目按 [MIT 许可证](LICENSE) 开放，包含代码、文档和仓库内图片，来源声明见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。像素角色随项目分发，使用和再分发时请保留版权与许可声明。横幅与放大角色图可用 `python3 docs/assets/src/render.py` 重新生成；界面截图需要另行启动离线演示并截取。
+本项目程序代码及文档文字采用 [MIT 许可证](LICENSE)。**哈基米、大肥鱼人物素材及包含它们的衍生图片不适用 MIT**，采用 [CC BY-NC-SA 4.0（署名—非商业性使用—相同方式共享）](ARTWORK_LICENSE.md)。人物参考 B 站 UP 主 [ZipZipPipe](https://space.bilibili.com/4168597) 发布的 AI 生成形象，由本项目进行像素化与表情改编；大肥鱼的上游原角色作者为上善无形。完整署名、来源、文件范围及修改说明见[人物素材许可](ARTWORK_LICENSE.md)，其他组件来源见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。代码的 MIT 许可不授予人物素材的商业使用权。
+
+横幅与放大角色图可用 `python3 docs/assets/src/render.py` 重新生成；界面截图需要另行启动离线演示并截取。生成方式不改变其中人物素材的许可。

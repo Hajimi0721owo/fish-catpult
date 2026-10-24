@@ -252,4 +252,6 @@ bili-fav-relay backup --output /安全位置/relay-state.sqlite3
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-验证状态见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)，设计取舍见 [docs/adr.md](docs/adr.md)。本项目按 [MIT 许可证](LICENSE) 开放，包含代码、文档和仓库内图片，来源声明见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。当前是开发版；长期运行、干净机器与跨平台安装验收仍待完成，详见验证文档。如果你 fork 后提交改动，不要把 `data/`、`.env`、`config.json` 等本地运行文件提交上去（`.gitignore` 已排除）。
+验证状态见 [docs/verification.md](docs/verification.md)，架构见 [docs/architecture.md](docs/architecture.md)，设计取舍见 [docs/adr.md](docs/adr.md)。程序代码及文档文字采用 [MIT 许可证](LICENSE)；哈基米、大肥鱼人物素材及包含它们的衍生图片单独采用 CC BY-NC-SA 4.0，不属于 MIT 范围。署名、来源和文件清单见 [ARTWORK_LICENSE.md](ARTWORK_LICENSE.md)，其他组件见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。分发安装包时保留两类许可及来源声明，不得将完整包描述为全部适用 MIT，也不得把代码许可解释为人物素材的商业使用许可。
+
+当前是开发版；长期运行、干净机器与跨平台安装验收仍待完成，详见验证文档。如果你 fork 后提交改动，不要把 `data/`、`.env`、`config.json` 等本地运行文件提交上去（`.gitignore` 已排除）。

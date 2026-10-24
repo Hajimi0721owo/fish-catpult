@@ -7,8 +7,8 @@ name = "bili-fav-relay"
 version = "0.1.0"
 description = "Fish-CatPult: relay new videos from a public Bilibili favorites folder to a QQ group via your own official QQ bot"
 readme = "README.md"
-license = "MIT"
-license-files = ["LICENSE", "THIRD_PARTY_LICENSES.md"]
+license = "MIT AND CC-BY-NC-SA-4.0"
+license-files = ["LICENSE", "ARTWORK_LICENSE.md", "LICENSES/CC-BY-NC-SA-4.0.txt", "THIRD_PARTY_LICENSES.md"]
 requires-python = ">=3.11"
 dependencies = ["websockets==16.1.1", "keyring==25.6.0"]
 
